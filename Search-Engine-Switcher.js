@@ -26,14 +26,14 @@
         id: 'google',
         name: 'Google',
         searchUrl: 'https://www.google.com/search?q={q}',
-        hosts: ['google.'],
+        hosts: ['google.', 'www.google.'],
         hidden: false
       },
       {
         id: 'bing',
         name: 'Bing',
         searchUrl: 'https://www.bing.com/search?q={q}',
-        hosts: ['bing.com'],
+        hosts: ['bing.com', 'www.bing.com', 'cn.bing.com'],
         hidden: false
       },
       {
@@ -62,7 +62,7 @@
         id: 'baidu',
         name: '百度',
         searchUrl: 'https://www.baidu.com/s?wd={q}',
-        hosts: ['baidu.com'],
+        hosts: ['baidu.com', 'www.baidu.com'],
         hidden: false
       },
       {
@@ -164,14 +164,14 @@
         id: 'bilibili',
         name: '哔哩哔哩',
         searchUrl: 'https://search.bilibili.com/all?keyword={q}',
-        hosts: ['search.bilibili.com', 'bilibili.com'],
+        hosts: ['search.bilibili.com', 'bilibili.com', 'www.bilibili.com'],
         hidden: true
       },
       {
         id: 'zhihu',
         name: '知乎',
         searchUrl: 'https://www.zhihu.com/search?q={q}',
-        hosts: ['zhihu.com'],
+        hosts: ['zhihu.com', 'www.zhihu.com'],
         hidden: true
       },
       {
@@ -185,7 +185,7 @@
         id: 'douyin',
         name: '抖音',
         searchUrl: 'https://www.douyin.com/search/{q}',
-        hosts: ['douyin.com'],
+        hosts: ['douyin.com', 'www.douyin.com'],
         hidden: true
       },
       {
@@ -698,6 +698,14 @@
     const root = createRoot();
     const list = root.querySelector(`#${ROOT_ID}-list`);
     list.innerHTML = '';
+
+    // 只在搜索引擎页面上显示
+    const host = location.hostname;
+    const isSearchEngine = config.engines.some((e) => (e.hosts || []).some((h) => host.includes(h)));
+    if (!isSearchEngine) {
+      root.classList.add('hidden');
+      return;
+    }
 
     const q = getCurrentQuery();
 
