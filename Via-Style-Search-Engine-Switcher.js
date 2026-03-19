@@ -1,15 +1,13 @@
 ﻿// ==UserScript==
 // @name         Via Style Search Engine Switcher
-// @namespace    https://example.local/
+// @namespace    https://github.com/EchoRan6319/Via-Style-Search-Engine-Switcher
 // @version      1.0.0
 // @description  类似 Via 浏览器的搜索引擎切换器：支持新增、删除、排序、位置自定义
-// @author       ChatGPT
+// @author       EchoRan6319
 // @match        *://*/*
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_registerMenuCommand
-// @grant        GM_xmlhttpRequest
-// @connect      searchapi.api.cloud.yandex.net
 // @run-at       document-idle
 // ==/UserScript==
 
@@ -23,41 +21,179 @@
 
   const DEFAULT_CONFIG = {
     engines: [
+      // ========== 国外传统搜索引擎 ==========
       {
-        id: 'baidu',
-        name: '百度',
-        searchUrl: 'https://www.baidu.com/s?wd={q}',
-        hosts: ['baidu.com']
+        id: 'google',
+        name: 'Google',
+        searchUrl: 'https://www.google.com/search?q={q}',
+        hosts: ['google.'],
+        hidden: false
       },
       {
         id: 'bing',
         name: 'Bing',
         searchUrl: 'https://www.bing.com/search?q={q}',
-        hosts: ['bing.com']
-      },
-      {
-        id: 'google',
-        name: 'Google',
-        searchUrl: 'https://www.google.com/search?q={q}',
-        hosts: ['google.']
+        hosts: ['bing.com'],
+        hidden: false
       },
       {
         id: 'duckduckgo',
         name: 'DuckDuckGo',
         searchUrl: 'https://duckduckgo.com/?q={q}',
-        hosts: ['duckduckgo.com']
+        hosts: ['duckduckgo.com'],
+        hidden: false
       },
       {
         id: 'brave',
         name: 'Brave',
         searchUrl: 'https://search.brave.com/search?q={q}',
-        hosts: ['search.brave.com']
+        hosts: ['search.brave.com'],
+        hidden: false
       },
       {
         id: 'yandex',
         name: 'Yandex',
-        searchUrl: 'https://yandex.com/search/?text={q}',
-        hosts: ['yandex.']
+        searchUrl: 'https://yandex.com/search/?text={q}&from=browser',
+        hosts: ['yandex.'],
+        hidden: false
+      },
+      // ========== 国内传统搜索引擎 ==========
+      {
+        id: 'baidu',
+        name: '百度',
+        searchUrl: 'https://www.baidu.com/s?wd={q}',
+        hosts: ['baidu.com'],
+        hidden: false
+      },
+      {
+        id: 'quark',
+        name: '夸克',
+        searchUrl: 'https://quark.sm.cn/s?q={q}',
+        hosts: ['quark.sm.cn', 'sm.cn'],
+        hidden: true
+      },
+      {
+        id: 'sogou',
+        name: '搜狗',
+        searchUrl: 'https://www.sogou.com/web?query={q}',
+        hosts: ['sogou.com'],
+        hidden: true
+      },
+      {
+        id: '360',
+        name: '360搜索',
+        searchUrl: 'https://www.so.com/s?q={q}',
+        hosts: ['so.com'],
+        hidden: true
+      },
+      // ========== 国外AI大模型 ==========
+      {
+        id: 'chatgpt',
+        name: 'ChatGPT',
+        searchUrl: 'https://chatgpt.com/?hints=search&q={q}',
+        hosts: ['chatgpt.com'],
+        hidden: true
+      },
+      {
+        id: 'gemini',
+        name: 'Gemini',
+        searchUrl: 'https://gemini.google.com/app?q={q}',
+        hosts: ['gemini.google.com'],
+        hidden: true
+      },
+      {
+        id: 'perplexity',
+        name: 'Perplexity',
+        searchUrl: 'https://www.perplexity.ai/?q={q}',
+        hosts: ['perplexity.ai'],
+        hidden: true
+      },
+      // ========== 国内AI大模型 ==========
+      {
+        id: 'qianwen',
+        name: '通义千问',
+        searchUrl: 'https://tongyi.aliyun.com/qianwen/?q={q}',
+        hosts: ['tongyi.aliyun.com'],
+        hidden: true
+      },
+      {
+        id: 'doubao',
+        name: '豆包',
+        searchUrl: 'https://www.doubao.com/chat/?q={q}',
+        hosts: ['doubao.com'],
+        hidden: true
+      },
+      {
+        id: 'deepseek',
+        name: 'DeepSeek',
+        searchUrl: 'https://chat.deepseek.com/?q={q}',
+        hosts: ['chat.deepseek.com'],
+        hidden: true
+      },
+      {
+        id: 'kimi',
+        name: 'Kimi',
+        searchUrl: 'https://kimi.moonshot.cn/?q={q}',
+        hosts: ['kimi.moonshot.cn'],
+        hidden: true
+      },
+      {
+        id: 'metaso',
+        name: '秘塔AI',
+        searchUrl: 'https://metaso.cn/?q={q}',
+        hosts: ['metaso.cn'],
+        hidden: true
+      },
+      // ========== 国外社交/社区 ==========
+      {
+        id: 'youtube',
+        name: 'YouTube',
+        searchUrl: 'https://www.youtube.com/results?search_query={q}',
+        hosts: ['youtube.com', 'm.youtube.com'],
+        hidden: true
+      },
+      {
+        id: 'github',
+        name: 'GitHub',
+        searchUrl: 'https://github.com/search?q={q}',
+        hosts: ['github.com'],
+        hidden: true
+      },
+      // ========== 国内社交/社区 ==========
+      {
+        id: 'bilibili',
+        name: '哔哩哔哩',
+        searchUrl: 'https://search.bilibili.com/all?keyword={q}',
+        hosts: ['search.bilibili.com', 'bilibili.com'],
+        hidden: true
+      },
+      {
+        id: 'zhihu',
+        name: '知乎',
+        searchUrl: 'https://www.zhihu.com/search?q={q}',
+        hosts: ['zhihu.com'],
+        hidden: true
+      },
+      {
+        id: 'xiaohongshu',
+        name: '小红书',
+        searchUrl: 'https://www.xiaohongshu.com/search_result?keyword={q}',
+        hosts: ['xiaohongshu.com'],
+        hidden: true
+      },
+      {
+        id: 'douyin',
+        name: '抖音',
+        searchUrl: 'https://www.douyin.com/search/{q}',
+        hosts: ['douyin.com'],
+        hidden: true
+      },
+      {
+        id: 'weixin',
+        name: '微信',
+        searchUrl: 'https://weixin.sogou.com/weixin?type=2&s_from=input&query={q}',
+        hosts: ['weixin.sogou.com'],
+        hidden: true
       }
     ],
     ui: {
@@ -68,18 +204,9 @@
       useCustomXY: false,
       customX: 16,
       customY: 16,
-      showWhenNoQuery: true,
-      openInNewTab: false
-    },
-    autoQuery: {
-      enabled: false,
-      endpoint: 'https://searchapi.api.cloud.yandex.net/v2/web/search',
-      authType: 'apikey',
-      credential: '',
-      folderId: '',
-      searchType: 'SEARCH_TYPE_COM',
-      l10n: 'LOCALIZATION_EN',
-      usePageTitleAsSeed: true
+      showWhenNoQuery: false,
+      openInNewTab: false,
+      theme: 'auto'
     }
   };
 
@@ -119,7 +246,8 @@
           id: String(e.id || uid()),
           name: String(e.name || '').trim(),
           searchUrl: String(e.searchUrl || '').trim(),
-          hosts: Array.isArray(e.hosts) ? e.hosts.map((h) => String(h).trim()).filter(Boolean) : []
+          hosts: Array.isArray(e.hosts) ? e.hosts.map((h) => String(h).trim()).filter(Boolean) : [],
+          hidden: !!e.hidden
         }))
         .filter((e) => e.name && e.searchUrl.includes('{q}'));
       if (cfg.engines.length === 0) cfg.engines = deepClone(DEFAULT_CONFIG.engines);
@@ -135,28 +263,7 @@
       cfg.ui.customY = Number.isFinite(raw.ui.customY) ? raw.ui.customY : cfg.ui.customY;
       cfg.ui.showWhenNoQuery = raw.ui.showWhenNoQuery !== false;
       cfg.ui.openInNewTab = !!raw.ui.openInNewTab;
-    }
-
-    if (raw.autoQuery && typeof raw.autoQuery === 'object') {
-      cfg.autoQuery.enabled = !!raw.autoQuery.enabled;
-      cfg.autoQuery.endpoint =
-        typeof raw.autoQuery.endpoint === 'string' && raw.autoQuery.endpoint.trim()
-          ? raw.autoQuery.endpoint.trim()
-          : cfg.autoQuery.endpoint;
-      cfg.autoQuery.authType = raw.autoQuery.authType === 'bearer' ? 'bearer' : 'apikey';
-      cfg.autoQuery.credential =
-        typeof raw.autoQuery.credential === 'string' ? raw.autoQuery.credential.trim() : '';
-      cfg.autoQuery.folderId =
-        typeof raw.autoQuery.folderId === 'string' ? raw.autoQuery.folderId.trim() : '';
-      cfg.autoQuery.searchType =
-        typeof raw.autoQuery.searchType === 'string' && raw.autoQuery.searchType.trim()
-          ? raw.autoQuery.searchType.trim()
-          : cfg.autoQuery.searchType;
-      cfg.autoQuery.l10n =
-        typeof raw.autoQuery.l10n === 'string' && raw.autoQuery.l10n.trim()
-          ? raw.autoQuery.l10n.trim()
-          : cfg.autoQuery.l10n;
-      cfg.autoQuery.usePageTitleAsSeed = raw.autoQuery.usePageTitleAsSeed !== false;
+      cfg.ui.theme = ['light', 'dark'].includes(raw.ui.theme) ? raw.ui.theme : 'auto';
     }
 
     return cfg;
@@ -178,11 +285,97 @@
 
   const config = loadConfig();
 
+  function applyTheme() {
+    const theme = config.ui.theme || 'auto';
+    const root = document.documentElement;
+    if (theme === 'light') {
+      root.setAttribute('data-theme', 'light');
+    } else if (theme === 'dark') {
+      root.removeAttribute('data-theme');
+    } else {
+      // auto: follow system preference
+      const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+      if (prefersLight) {
+        root.setAttribute('data-theme', 'light');
+      } else {
+        root.removeAttribute('data-theme');
+      }
+    }
+  }
+
   function injectStyle() {
     if (document.getElementById(STYLE_ID)) return;
     const style = document.createElement('style');
     style.id = STYLE_ID;
     style.textContent = `
+      :root {
+        --se-bg-primary: rgba(16, 16, 16, 0.92);
+        --se-bg-secondary: #101114;
+        --se-bg-input: #151820;
+        --se-bg-button: #20232a;
+        --se-text-primary: #fff;
+        --se-text-secondary: #f3f3f3;
+        --se-text-muted: #9fa6b2;
+        --se-text-label: #aeb6c2;
+        --se-border-color: rgba(255, 255, 255, 0.12);
+        --se-border-light: rgba(255, 255, 255, 0.14);
+        --se-border-medium: rgba(255, 255, 255, 0.16);
+        --se-border-pill: rgba(255, 255, 255, 0.2);
+        --se-shadow: rgba(0, 0, 0, 0.32);
+        --se-shadow-panel: rgba(0, 0, 0, 0.35);
+        --se-overlay: rgba(0, 0, 0, 0.45);
+        --se-active-border: #7ea1ff;
+        --se-active-shadow: rgba(126, 161, 255, 0.35);
+        --se-primary-bg: #2e5fff;
+        --se-danger-bg: #6b2026;
+        --se-danger-border: #9f3540;
+      }
+      [data-theme="light"] {
+        --se-bg-primary: rgba(255, 255, 255, 0.95);
+        --se-bg-secondary: #f5f5f7;
+        --se-bg-input: #ffffff;
+        --se-bg-button: #e8e8ed;
+        --se-text-primary: #1c1c1e;
+        --se-text-secondary: #2c2c2e;
+        --se-text-muted: #6c6c70;
+        --se-text-label: #3a3a3c;
+        --se-border-color: rgba(0, 0, 0, 0.1);
+        --se-border-light: rgba(0, 0, 0, 0.12);
+        --se-border-medium: rgba(0, 0, 0, 0.15);
+        --se-border-pill: rgba(0, 0, 0, 0.15);
+        --se-shadow: rgba(0, 0, 0, 0.15);
+        --se-shadow-panel: rgba(0, 0, 0, 0.2);
+        --se-overlay: rgba(0, 0, 0, 0.35);
+        --se-active-border: #007aff;
+        --se-active-shadow: rgba(0, 122, 255, 0.3);
+        --se-primary-bg: #007aff;
+        --se-danger-bg: #ff3b30;
+        --se-danger-border: #ff3b30;
+      }
+      @media (prefers-color-scheme: light) {
+        :root:not([data-theme="dark"]) {
+          --se-bg-primary: rgba(255, 255, 255, 0.95);
+          --se-bg-secondary: #f5f5f7;
+          --se-bg-input: #ffffff;
+          --se-bg-button: #e8e8ed;
+          --se-text-primary: #1c1c1e;
+          --se-text-secondary: #2c2c2e;
+          --se-text-muted: #6c6c70;
+          --se-text-label: #3a3a3c;
+          --se-border-color: rgba(0, 0, 0, 0.1);
+          --se-border-light: rgba(0, 0, 0, 0.12);
+          --se-border-medium: rgba(0, 0, 0, 0.15);
+          --se-border-pill: rgba(0, 0, 0, 0.15);
+          --se-shadow: rgba(0, 0, 0, 0.15);
+          --se-shadow-panel: rgba(0, 0, 0, 0.2);
+          --se-overlay: rgba(0, 0, 0, 0.35);
+          --se-active-border: #007aff;
+          --se-active-shadow: rgba(0, 122, 255, 0.3);
+          --se-primary-bg: #007aff;
+          --se-danger-bg: #ff3b30;
+          --se-danger-border: #ff3b30;
+        }
+      }
       #${ROOT_ID} {
         position: fixed;
         z-index: 2147483646;
@@ -197,11 +390,11 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        background: rgba(16, 16, 16, 0.92);
-        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: var(--se-bg-primary);
+        border: 1px solid var(--se-border-color);
         border-radius: 16px;
         padding: 8px;
-        box-shadow: 0 8px 26px rgba(0, 0, 0, 0.32);
+        box-shadow: 0 8px 26px var(--se-shadow);
         backdrop-filter: blur(6px);
       }
       #${ROOT_ID} .se-list {
@@ -216,9 +409,9 @@
       }
       #${ROOT_ID} .se-pill,
       #${ROOT_ID} .se-btn {
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        background: rgba(255, 255, 255, 0.06);
-        color: #fff;
+        border: 1px solid var(--se-border-pill);
+        background: var(--se-bg-button);
+        color: var(--se-text-primary);
         border-radius: 999px;
         padding: 6px 12px;
         font-size: 13px;
@@ -227,8 +420,8 @@
         white-space: nowrap;
       }
       #${ROOT_ID} .se-pill.active {
-        border-color: #7ea1ff;
-        box-shadow: 0 0 0 1px rgba(126, 161, 255, 0.35) inset;
+        border-color: var(--se-active-border);
+        box-shadow: 0 0 0 1px var(--se-active-shadow) inset;
       }
       #${ROOT_ID} .se-btn {
         width: 34px;
@@ -243,7 +436,7 @@
         position: fixed;
         inset: 0;
         z-index: 2147483647;
-        background: rgba(0, 0, 0, 0.45);
+        background: var(--se-overlay);
         display: none;
         align-items: center;
         justify-content: center;
@@ -255,11 +448,12 @@
         width: min(96vw, 720px);
         max-height: 90vh;
         overflow: auto;
-        background: #101114;
-        color: #f3f3f3;
+        overscroll-behavior: contain;
+        background: var(--se-bg-secondary);
+        color: var(--se-text-secondary);
         border-radius: 14px;
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        box-shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
+        border: 1px solid var(--se-border-light);
+        box-shadow: 0 18px 48px var(--se-shadow-panel);
         padding: 14px;
         font-size: 14px;
       }
@@ -276,12 +470,16 @@
         grid-template-columns: 1fr auto;
         gap: 8px;
         padding: 8px;
-        border: 1px solid rgba(255, 255, 255, 0.12);
+        border: 1px solid var(--se-border-color);
         border-radius: 10px;
         margin-bottom: 8px;
       }
+      #${PANEL_ID} .engine-row.hidden-engine {
+        opacity: 0.6;
+        background: var(--se-bg-button);
+      }
       #${PANEL_ID} .muted {
-        color: #9fa6b2;
+        color: var(--se-text-muted);
         font-size: 12px;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -302,19 +500,21 @@
       #${PANEL_ID} .danger,
       #${PANEL_ID} .ghost {
         border-radius: 8px;
-        border: 1px solid rgba(255, 255, 255, 0.16);
-        background: #20232a;
-        color: #fff;
+        border: 1px solid var(--se-border-medium);
+        background: var(--se-bg-button);
+        color: var(--se-text-primary);
         padding: 6px 10px;
         cursor: pointer;
       }
       #${PANEL_ID} .primary {
-        background: #2e5fff;
-        border-color: #2e5fff;
+        background: var(--se-primary-bg);
+        border-color: var(--se-primary-bg);
+        color: #fff;
       }
       #${PANEL_ID} .danger {
-        background: #6b2026;
-        border-color: #9f3540;
+        background: var(--se-danger-bg);
+        border-color: var(--se-danger-border);
+        color: #fff;
       }
       #${PANEL_ID} .ghost {
         background: transparent;
@@ -325,7 +525,7 @@
         gap: 8px;
       }
       #${PANEL_ID} .form {
-        border: 1px solid rgba(255, 255, 255, 0.12);
+        border: 1px solid var(--se-border-color);
         border-radius: 10px;
         padding: 10px;
         margin-top: 8px;
@@ -334,15 +534,15 @@
         display: block;
         font-size: 12px;
         margin-bottom: 4px;
-        color: #aeb6c2;
+        color: var(--se-text-label);
       }
       #${PANEL_ID} input,
       #${PANEL_ID} select {
         width: 100%;
         box-sizing: border-box;
-        background: #151820;
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        color: #fff;
+        background: var(--se-bg-input);
+        border: 1px solid var(--se-border-light);
+        color: var(--se-text-primary);
         border-radius: 8px;
         padding: 6px 8px;
       }
@@ -410,132 +610,8 @@
     return engine.searchUrl.replace('{q}', encodeURIComponent(query));
   }
 
-  function decodeEntities(text) {
-    const t = document.createElement('textarea');
-    t.innerHTML = text;
-    return t.value;
-  }
-
-  function cleanupQueryText(text) {
-    return String(text || '')
-      .replace(/\s+/g, ' ')
-      .replace(/[|\-_/]+/g, ' ')
-      .trim();
-  }
-
-  function getAutoSeedText() {
-    const selected = String(window.getSelection && window.getSelection()).trim();
-    if (selected) return cleanupQueryText(selected);
-
-    const focused = document.activeElement;
-    if (focused && focused.tagName === 'INPUT') {
-      const inputValue = typeof focused.value === 'string' ? focused.value.trim() : '';
-      if (inputValue) return cleanupQueryText(inputValue);
-    }
-
-    if (config.autoQuery.usePageTitleAsSeed) {
-      const title = cleanupQueryText(document.title);
-      if (title) return title;
-    }
-
-    const h1 = document.querySelector('h1');
-    if (h1) {
-      const h1Text = cleanupQueryText(h1.textContent || '');
-      if (h1Text) return h1Text;
-    }
-
-    return '';
-  }
-
-  function gmHttpRequest(options) {
-    return new Promise((resolve, reject) => {
-      if (typeof GM_xmlhttpRequest !== 'function') {
-        reject(new Error('GM_xmlhttpRequest not available'));
-        return;
-      }
-
-      GM_xmlhttpRequest({
-        method: options.method || 'GET',
-        url: options.url,
-        headers: options.headers || {},
-        data: options.data || null,
-        timeout: options.timeout || 12000,
-        onload: (res) => resolve(res),
-        ontimeout: () => reject(new Error('request timeout')),
-        onerror: () => reject(new Error('request error'))
-      });
-    });
-  }
-
-  function extractQueryFromRawData(rawData, fallback) {
-    const raw = String(rawData || '');
-    if (!raw) return fallback;
-
-    const patterns = [
-      /<fixq>([\s\S]*?)<\/fixq>/i,
-      /<reask>([\s\S]*?)<\/reask>/i,
-      /<query>([\s\S]*?)<\/query>/i,
-      /<hlword>([\s\S]*?)<\/hlword>/i
-    ];
-
-    for (const re of patterns) {
-      const m = raw.match(re);
-      if (!m || !m[1]) continue;
-      const q = cleanupQueryText(decodeEntities(m[1].replace(/<[^>]*>/g, '')));
-      if (q) return q;
-    }
-
-    return fallback;
-  }
-
-  async function getAutoQueryByYandexApi() {
-    const aq = config.autoQuery;
-    if (!aq.enabled) return '';
-    if (!aq.credential || !aq.folderId) return '';
-
-    const seed = getAutoSeedText();
-    if (!seed) return '';
-
-    const headers = {
-      'Content-Type': 'application/json',
-      Authorization: aq.authType === 'bearer' ? `Bearer ${aq.credential}` : `Api-Key ${aq.credential}`
-    };
-
-    const payload = {
-      query: {
-        searchType: aq.searchType || 'SEARCH_TYPE_COM',
-        queryText: seed,
-        fixTypoMode: 'FIX_TYPO_MODE_ON'
-      },
-      folderId: aq.folderId,
-      l10n: aq.l10n || 'LOCALIZATION_EN',
-      responseFormat: 'FORMAT_XML'
-    };
-
-    try {
-      const response = await gmHttpRequest({
-        method: 'POST',
-        url: aq.endpoint || 'https://searchapi.api.cloud.yandex.net/v2/web/search',
-        headers,
-        data: JSON.stringify(payload)
-      });
-
-      if (response.status < 200 || response.status >= 300) {
-        return seed;
-      }
-
-      const data = JSON.parse(response.responseText || '{}');
-      return extractQueryFromRawData(data.rawData, seed);
-    } catch (_) {
-      return seed;
-    }
-  }
-
   async function resolveQuery() {
     let q = getCurrentQuery();
-    if (q) return q.trim();
-
-    q = await getAutoQueryByYandexApi();
     if (q) return q.trim();
 
     q = prompt('输入搜索关键词');
@@ -556,17 +632,20 @@
       return;
     }
 
+    // 垂直位置
     if (ui.vertical === 'top') {
       root.style.top = `${Math.max(0, ui.offsetY)}px`;
     } else {
       root.style.bottom = `${Math.max(0, ui.offsetY)}px`;
     }
 
+    // 水平位置：默认居中
     if (ui.align === 'left') {
       root.style.left = `${Math.max(0, ui.offsetX)}px`;
     } else if (ui.align === 'right') {
       root.style.right = `${Math.max(0, ui.offsetX)}px`;
     } else {
+      // 居中（默认）
       root.style.left = '50%';
       root.style.transform = 'translateX(-50%)';
     }
@@ -607,29 +686,40 @@
     return root;
   }
 
+  function isSearchPage() {
+    const host = location.hostname;
+    const isSearchEngine = config.engines.some((e) => (e.hosts || []).some((h) => host.includes(h)));
+    if (!isSearchEngine) return false;
+    const query = getCurrentQuery();
+    return !!query;
+  }
+
   function renderEngineButtons() {
     const root = createRoot();
     const list = root.querySelector(`#${ROOT_ID}-list`);
     list.innerHTML = '';
 
-    const activeId = activeEngineIdByHost();
-    const query = getCurrentQuery();
-    if (!query && !config.ui.showWhenNoQuery) {
+    const q = getCurrentQuery();
+
+    // 无关键词时根据设置决定是否显示
+    if (!q && !config.ui.showWhenNoQuery) {
       root.classList.add('hidden');
       return;
     }
 
+    const activeId = activeEngineIdByHost();
     root.classList.remove('hidden');
     for (const engine of config.engines) {
+      if (engine.hidden) continue;
       const btn = document.createElement('button');
       btn.className = 'se-pill';
       if (engine.id === activeId) btn.classList.add('active');
       btn.textContent = engine.name;
       btn.title = `${engine.name}\n${engine.searchUrl}`;
       btn.addEventListener('click', async () => {
-        const q = await resolveQuery();
-        if (!q) return;
-        const url = buildSearchUrl(engine, q);
+        const query = await resolveQuery();
+        if (!query) return;
+        const url = buildSearchUrl(engine, query);
         if (config.ui.openInNewTab) {
           window.open(url, '_blank');
         } else {
@@ -719,6 +809,15 @@
     renderEngineButtons();
   }
 
+  function toggleEngineVisibility(index) {
+    const engine = config.engines[index];
+    if (!engine) return;
+    engine.hidden = !engine.hidden;
+    saveConfig(config);
+    renderPanel();
+    renderEngineButtons();
+  }
+
   function startDragPositioning() {
     const root = createRoot();
     config.ui.useCustomXY = true;
@@ -774,9 +873,9 @@
     const engineRows = config.engines
       .map(
         (e, i) => `
-      <div class="engine-row" data-index="${i}">
+      <div class="engine-row ${e.hidden ? 'hidden-engine' : ''}" data-index="${i}">
         <div>
-          <div><strong>${escapeHtml(e.name)}</strong></div>
+          <div><strong>${escapeHtml(e.name)}${e.hidden ? ' <span class="muted">(已隐藏)</span>' : ''}</strong></div>
           <div class="muted">${escapeHtml(e.searchUrl)}</div>
           <div class="muted">识别域名: ${escapeHtml((e.hosts || []).join(', ') || '(空)')}</div>
         </div>
@@ -784,6 +883,7 @@
           <button class="op" data-act="up">↑</button>
           <button class="op" data-act="down">↓</button>
           <button class="op" data-act="edit">编辑</button>
+          <button class="op" data-act="${e.hidden ? 'show' : 'hide'}">${e.hidden ? '显示' : '隐藏'}</button>
           <button class="danger" data-act="del">删除</button>
         </div>
       </div>
@@ -794,14 +894,19 @@
     panel.innerHTML = `
       <h3>搜索引擎切换器设置</h3>
 
-      <div class="sub">引擎列表（支持新增 / 删除 / 排序）</div>
+      <div class="sub" style="display:flex; justify-content:space-between; align-items:center;">
+        <span>引擎列表（支持新增 / 删除 / 排序 / 隐藏）</span>
+        <button class="ghost" id="se-reset-engines" style="padding:4px 8px; font-size:12px;">恢复默认</button>
+      </div>
       <div>${engineRows}</div>
       <div style="margin-top:8px;">
         <button class="primary" id="se-add">新增搜索引擎</button>
-        <button class="ghost" id="se-reset">恢复默认</button>
       </div>
 
-      <div class="sub">显示位置</div>
+      <div class="sub" style="display:flex; justify-content:space-between; align-items:center;">
+        <span>显示位置</span>
+        <button class="ghost" id="se-reset-position" style="padding:4px 8px; font-size:12px;">恢复默认</button>
+      </div>
       <div class="grid2">
         <div>
           <label>定位模式</label>
@@ -846,7 +951,10 @@
         <button class="op" id="se-drag">拖拽定位</button>
       </div>
 
-      <div class="sub">行为选项</div>
+      <div class="sub" style="display:flex; justify-content:space-between; align-items:center;">
+        <span>行为选项</span>
+        <button class="ghost" id="se-reset-behavior" style="padding:4px 8px; font-size:12px;">恢复默认</button>
+      </div>
       <div class="grid2">
         <div>
           <label>无关键词时</label>
@@ -862,63 +970,12 @@
             <option value="1" ${config.ui.openInNewTab ? 'selected' : ''}>新标签页</option>
           </select>
         </div>
-      </div>
-
-      <div class="sub">自动设定关键词（Yandex Search API v2）</div>
-      <div class="grid2">
         <div>
-          <label>启用自动设定</label>
-          <select id="se-auto-enabled">
-            <option value="0" ${!config.autoQuery.enabled ? 'selected' : ''}>关闭</option>
-            <option value="1" ${config.autoQuery.enabled ? 'selected' : ''}>开启</option>
-          </select>
-        </div>
-        <div>
-          <label>认证类型</label>
-          <select id="se-auto-auth-type">
-            <option value="apikey" ${config.autoQuery.authType !== 'bearer' ? 'selected' : ''}>Api-Key</option>
-            <option value="bearer" ${config.autoQuery.authType === 'bearer' ? 'selected' : ''}>Bearer(IAM)</option>
-          </select>
-        </div>
-        <div>
-          <label>凭据（明文保存）</label>
-          <input type="password" id="se-auto-credential" value="${escapeHtml(config.autoQuery.credential || '')}" placeholder="Api-Key 或 IAM Token" />
-        </div>
-        <div>
-          <label>folderId</label>
-          <input type="text" id="se-auto-folder-id" value="${escapeHtml(config.autoQuery.folderId || '')}" placeholder="b1gxxxxxxxxxxxxxx" />
-        </div>
-        <div>
-          <label>searchType</label>
-          <select id="se-auto-search-type">
-            <option value="SEARCH_TYPE_COM" ${config.autoQuery.searchType === 'SEARCH_TYPE_COM' ? 'selected' : ''}>SEARCH_TYPE_COM</option>
-            <option value="SEARCH_TYPE_RU" ${config.autoQuery.searchType === 'SEARCH_TYPE_RU' ? 'selected' : ''}>SEARCH_TYPE_RU</option>
-            <option value="SEARCH_TYPE_TR" ${config.autoQuery.searchType === 'SEARCH_TYPE_TR' ? 'selected' : ''}>SEARCH_TYPE_TR</option>
-            <option value="SEARCH_TYPE_KK" ${config.autoQuery.searchType === 'SEARCH_TYPE_KK' ? 'selected' : ''}>SEARCH_TYPE_KK</option>
-            <option value="SEARCH_TYPE_BE" ${config.autoQuery.searchType === 'SEARCH_TYPE_BE' ? 'selected' : ''}>SEARCH_TYPE_BE</option>
-            <option value="SEARCH_TYPE_UZ" ${config.autoQuery.searchType === 'SEARCH_TYPE_UZ' ? 'selected' : ''}>SEARCH_TYPE_UZ</option>
-          </select>
-        </div>
-        <div>
-          <label>l10n</label>
-          <select id="se-auto-l10n">
-            <option value="LOCALIZATION_EN" ${config.autoQuery.l10n === 'LOCALIZATION_EN' ? 'selected' : ''}>LOCALIZATION_EN</option>
-            <option value="LOCALIZATION_RU" ${config.autoQuery.l10n === 'LOCALIZATION_RU' ? 'selected' : ''}>LOCALIZATION_RU</option>
-            <option value="LOCALIZATION_TR" ${config.autoQuery.l10n === 'LOCALIZATION_TR' ? 'selected' : ''}>LOCALIZATION_TR</option>
-            <option value="LOCALIZATION_UK" ${config.autoQuery.l10n === 'LOCALIZATION_UK' ? 'selected' : ''}>LOCALIZATION_UK</option>
-            <option value="LOCALIZATION_BE" ${config.autoQuery.l10n === 'LOCALIZATION_BE' ? 'selected' : ''}>LOCALIZATION_BE</option>
-            <option value="LOCALIZATION_KK" ${config.autoQuery.l10n === 'LOCALIZATION_KK' ? 'selected' : ''}>LOCALIZATION_KK</option>
-          </select>
-        </div>
-        <div>
-          <label>API 端点</label>
-          <input type="text" id="se-auto-endpoint" value="${escapeHtml(config.autoQuery.endpoint || '')}" />
-        </div>
-        <div>
-          <label>页面标题作为种子</label>
-          <select id="se-auto-use-title">
-            <option value="1" ${config.autoQuery.usePageTitleAsSeed ? 'selected' : ''}>是</option>
-            <option value="0" ${!config.autoQuery.usePageTitleAsSeed ? 'selected' : ''}>否</option>
+          <label>主题模式</label>
+          <select id="se-theme">
+            <option value="auto" ${config.ui.theme === 'auto' ? 'selected' : ''}>跟随系统</option>
+            <option value="light" ${config.ui.theme === 'light' ? 'selected' : ''}>浅色</option>
+            <option value="dark" ${config.ui.theme === 'dark' ? 'selected' : ''}>深色</option>
           </select>
         </div>
       </div>
@@ -943,19 +1000,48 @@
         if (act === 'down') moveEngine(index, 1);
         if (act === 'edit') editEngine(config.engines[index]);
         if (act === 'del') deleteEngine(index);
+        if (act === 'hide' || act === 'show') toggleEngineVisibility(index);
       });
     });
 
     panel.querySelector('#se-add').addEventListener('click', () => editEngine(null));
-    panel.querySelector('#se-reset').addEventListener('click', () => {
-      if (!confirm('确定恢复默认配置吗？')) return;
+
+    // 恢复默认 - 引擎列表
+    panel.querySelector('#se-reset-engines').addEventListener('click', () => {
+      if (!confirm('确定恢复默认搜索引擎列表吗？')) return;
       const reset = deepClone(DEFAULT_CONFIG);
       config.engines = reset.engines;
-      config.ui = reset.ui;
-      config.autoQuery = reset.autoQuery;
       saveConfig(config);
       renderPanel();
       renderEngineButtons();
+    });
+
+    // 恢复默认 - 显示位置
+    panel.querySelector('#se-reset-position').addEventListener('click', () => {
+      if (!confirm('确定恢复默认显示位置吗？')) return;
+      const reset = deepClone(DEFAULT_CONFIG);
+      config.ui.vertical = reset.ui.vertical;
+      config.ui.align = reset.ui.align;
+      config.ui.offsetX = reset.ui.offsetX;
+      config.ui.offsetY = reset.ui.offsetY;
+      config.ui.useCustomXY = reset.ui.useCustomXY;
+      config.ui.customX = reset.ui.customX;
+      config.ui.customY = reset.ui.customY;
+      saveConfig(config);
+      applyRootPosition(createRoot());
+      renderPanel();
+    });
+
+    // 恢复默认 - 行为选项
+    panel.querySelector('#se-reset-behavior').addEventListener('click', () => {
+      if (!confirm('确定恢复默认行为选项吗？')) return;
+      const reset = deepClone(DEFAULT_CONFIG);
+      config.ui.showWhenNoQuery = reset.ui.showWhenNoQuery;
+      config.ui.openInNewTab = reset.ui.openInNewTab;
+      config.ui.theme = reset.ui.theme;
+      saveConfig(config);
+      applyTheme();
+      renderPanel();
     });
 
     panel.querySelector('#se-drag').addEventListener('click', () => {
@@ -974,17 +1060,11 @@
       const customY = Number(panel.querySelector('#se-custom-y').value) || 0;
       const showNoQuery = panel.querySelector('#se-show-no-query').value === '1';
       const openInNewTab = panel.querySelector('#se-open-way').value === '1';
-      const autoEnabled = panel.querySelector('#se-auto-enabled').value === '1';
-      const autoAuthType = panel.querySelector('#se-auto-auth-type').value;
-      const autoCredential = panel.querySelector('#se-auto-credential').value.trim();
-      const autoFolderId = panel.querySelector('#se-auto-folder-id').value.trim();
-      const autoSearchType = panel.querySelector('#se-auto-search-type').value;
-      const autoL10n = panel.querySelector('#se-auto-l10n').value;
-      const autoEndpoint = panel.querySelector('#se-auto-endpoint').value.trim();
-      const autoUseTitle = panel.querySelector('#se-auto-use-title').value === '1';
+      const theme = panel.querySelector('#se-theme').value;
 
       config.ui.useCustomXY = posMode === 'custom';
       config.ui.vertical = vertical === 'top' ? 'top' : 'bottom';
+      config.ui.theme = ['light', 'dark'].includes(theme) ? theme : 'auto';
       config.ui.align = ['left', 'center', 'right'].includes(align) ? align : 'center';
       config.ui.offsetX = Math.max(0, offsetX);
       config.ui.offsetY = Math.max(0, offsetY);
@@ -992,17 +1072,10 @@
       config.ui.customY = Math.max(0, customY);
       config.ui.showWhenNoQuery = showNoQuery;
       config.ui.openInNewTab = openInNewTab;
-      config.autoQuery.enabled = autoEnabled;
-      config.autoQuery.authType = autoAuthType === 'bearer' ? 'bearer' : 'apikey';
-      config.autoQuery.credential = autoCredential;
-      config.autoQuery.folderId = autoFolderId;
-      config.autoQuery.searchType = autoSearchType || 'SEARCH_TYPE_COM';
-      config.autoQuery.l10n = autoL10n || 'LOCALIZATION_EN';
-      config.autoQuery.endpoint = autoEndpoint || 'https://searchapi.api.cloud.yandex.net/v2/web/search';
-      config.autoQuery.usePageTitleAsSeed = autoUseTitle;
 
       saveConfig(config);
       applyRootPosition(createRoot());
+      applyTheme();
       renderEngineButtons();
       closePanel();
     });
@@ -1012,6 +1085,27 @@
     renderPanel();
     const overlay = createPanel();
     overlay.classList.add('show');
+
+    // 阻止面板滚动影响下方网页
+    const panel = overlay.querySelector('.panel');
+    if (panel) {
+      panel.addEventListener('wheel', (e) => {
+        const isScrollingUp = e.deltaY < 0;
+        const isScrollingDown = e.deltaY > 0;
+        const isAtTop = panel.scrollTop === 0;
+        const isAtBottom = panel.scrollTop + panel.clientHeight >= panel.scrollHeight - 1;
+
+        // 如果在顶部继续向上滚动，或在底部继续向下滚动，阻止事件
+        if ((isScrollingUp && isAtTop) || (isScrollingDown && isAtBottom)) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+
+      // 阻止 touchmove 事件冒泡
+      panel.addEventListener('touchmove', (e) => {
+        e.stopPropagation();
+      }, { passive: true });
+    }
   }
 
   function closePanel() {
@@ -1030,6 +1124,7 @@
 
   function init() {
     injectStyle();
+    applyTheme();
     createRoot();
     renderEngineButtons();
 
@@ -1043,6 +1138,16 @@
 
     window.addEventListener('popstate', renderEngineButtons);
     window.addEventListener('hashchange', renderEngineButtons);
+
+    // Listen for system theme changes when in auto mode
+    if (window.matchMedia) {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
+      mediaQuery.addEventListener('change', () => {
+        if (config.ui.theme === 'auto') {
+          applyTheme();
+        }
+      });
+    }
 
     const observer = new MutationObserver(() => {
       if (!document.getElementById(ROOT_ID)) {
