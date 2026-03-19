@@ -1,6 +1,13 @@
-# Via Style Search Engine Switcher
+# Search Engine Switcher
 
-一个仿照 Via 浏览器搜索引擎切换器设计的油猴脚本，让你在任何网页都能快速切换搜索引擎。
+一个浏览器搜索引擎切换器设计的油猴脚本，让你在任何网页都能快速切换搜索引擎。
+
+## 界面展示
+
+!\[浅色模式主界面]\(./屏幕截图%202026-03-19%20211230.png null)
+!\[深色模式主界面]\(./屏幕截图%202026-03-19%20211207.png null)
+!\[设置面板-引擎列表]\(./屏幕截图%202026-03-19%20211317.png null)
+!\[设置面板-显示位置]\(./屏幕截图%202026-03-19%20211320.png null)
 
 ## 功能特性
 
@@ -20,8 +27,9 @@
 ### 1. 安装脚本管理器
 
 首先需要在浏览器中安装一个用户脚本管理器：
-- **Tampermonkey（推荐）**：https://www.tampermonkey.net/
-- **Greasemonkey**（Firefox）：https://addons.mozilla.org/firefox/addon/greasemonkey/
+
+- **Tampermonkey（推荐）**：<https://www.tampermonkey.net/>
+- **Greasemonkey**（Firefox）：<https://addons.mozilla.org/firefox/addon/greasemonkey/>
 
 ### 2. 安装脚本
 
@@ -32,6 +40,7 @@
 ### 3. 使用方法
 
 #### 基本使用
+
 - 在任意网页，悬浮控件会显示在页面底部（默认位置）
 - 点击搜索引擎名称即可切换到该引擎，自动携带当前搜索词
 - 长按悬浮控件或点击 ⚙ 按钮打开设置面板
@@ -39,6 +48,7 @@
 #### 设置面板
 
 **引擎列表**
+
 - 新增：添加自定义搜索引擎
 - 删除：移除不需要的搜索引擎
 - 排序：使用 ↑ ↓ 按钮调整顺序
@@ -46,6 +56,7 @@
 - 恢复默认：重置为预设搜索引擎列表
 
 **显示位置**
+
 - 定位模式：预设位置或自定义坐标
 - 垂直位置：顶部或底部
 - 水平对齐：左、中、右
@@ -54,6 +65,7 @@
 - 恢复默认：重置为默认位置
 
 **行为选项**
+
 - 无关键词时：是否在搜索框为空时显示切换器
 - 打开方式：在新标签页或当前标签页打开搜索结果
 - 主题模式：跟随系统、浅色或深色
@@ -62,6 +74,7 @@
 #### 默认启用的搜索引擎
 
 脚本默认启用以下 6 个搜索引擎：
+
 1. Google
 2. Bing
 3. DuckDuckGo
@@ -78,11 +91,13 @@
 本脚本采用纯原生 JavaScript 实现，主要包含以下模块：
 
 #### 1. 配置管理
+
 - 使用 `GM_getValue` / `GM_setValue` 或 `localStorage` 持久化用户配置
 - 支持配置合并和迁移，确保版本更新时用户设置不丢失
 - 默认配置包含完整的搜索引擎列表和 UI 设置
 
 #### 2. 搜索引擎检测
+
 ```javascript
 function activeEngineIdByHost() {
   const host = location.hostname;
@@ -91,10 +106,12 @@ function activeEngineIdByHost() {
   )?.id;
 }
 ```
+
 - 通过当前页面的域名匹配搜索引擎的 hosts 配置
 - 自动识别当前所在的搜索引擎
 
 #### 3. 搜索词提取
+
 ```javascript
 function getCurrentQuery() {
   const url = new URL(location.href);
@@ -107,24 +124,29 @@ function getCurrentQuery() {
   return '';
 }
 ```
+
 - 解析当前页面 URL，提取搜索关键词
 - 支持多种常见的搜索参数名
 
 #### 4. URL 构建
+
 ```javascript
 function buildSearchUrl(engine, query) {
   return engine.searchUrl.replace('{q}', encodeURIComponent(query));
 }
 ```
+
 - 将搜索词编码后替换到搜索引擎的 URL 模板中
 
 #### 5. UI 渲染
+
 - 使用 Shadow DOM 隔离样式，避免与页面样式冲突
 - CSS 变量实现深浅色主题切换
 - 响应式设计，适配不同屏幕尺寸
 - `overscroll-behavior: contain` 防止设置面板滚动穿透
 
 #### 6. 事件处理
+
 - 点击事件：切换搜索引擎
 - 长按事件：打开设置面板（500ms）
 - 拖拽事件：自定义悬浮控件位置
@@ -180,7 +202,9 @@ MIT License
 ## 更新日志
 
 ### v1.0.0
+
 - 初始版本发布
 - 支持 22+ 个预设搜索引擎
 - 支持自定义搜索引擎
 - 支持位置自定义和主题切换
+

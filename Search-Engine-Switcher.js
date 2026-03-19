@@ -1,8 +1,8 @@
 ﻿// ==UserScript==
-// @name         Via Style Search Engine Switcher
-// @namespace    https://github.com/EchoRan6319/Via-Style-Search-Engine-Switcher
-// @version      1.0.0
-// @description  类似 Via 浏览器的搜索引擎切换器：支持新增、删除、排序、位置自定义
+// @name         Search Engine Switcher
+// @namespace    https://github.com/EchoRan6319/Search-Engine-Switcher
+// @version      2.0.0
+// @description  快捷搜索引擎切换器：支持新增、删除、排序、位置自定义
 // @author       EchoRan6319
 // @match        *://*/*
 // @grant        GM_getValue
@@ -312,7 +312,7 @@
         --se-bg-primary: rgba(16, 16, 16, 0.92);
         --se-bg-secondary: #101114;
         --se-bg-input: #151820;
-        --se-bg-button: #20232a;
+        --se-bg-button: #4a4a4a;
         --se-text-primary: #fff;
         --se-text-secondary: #f3f3f3;
         --se-text-muted: #9fa6b2;
