@@ -1,6 +1,6 @@
-# Via Style Search Engine Switcher
+# Search Engine Switcher
 
-一个仿照 Via 浏览器搜索引擎切换器设计的油猴脚本，让你在任何网页都能快速切换搜索引擎。
+一个浏览器搜索引擎切换器设计的油猴脚本，让你在任何网页都能快速切换搜索引擎。
 
 ## 功能特性
 
