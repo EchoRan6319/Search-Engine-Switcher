@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name         Search Engine Switcher
 // @namespace    https://github.com/EchoRan6319/Search-Engine-Switcher
-// @version      2.0.0
+// @version      2.3.0
 // @description  快捷搜索引擎切换器：支持新增、删除、排序、位置自定义
 // @author       EchoRan6319
 // @match        *://*/*
@@ -14,10 +14,14 @@
 (function () {
   'use strict';
 
-  const STORAGE_KEY = 'via_like_search_switcher_config_v1';
-  const STYLE_ID = 'via-like-switcher-style';
-  const ROOT_ID = 'via-like-switcher-root';
-  const PANEL_ID = 'via-like-switcher-panel';
+  if (window !== window.top) return;
+
+  const STORAGE_KEY = 'search_engine_switcher_config_v1';
+  const VERSION_KEY = 'search_engine_switcher_version';
+  const CURRENT_VERSION = '2.3.0';
+  const STYLE_ID = 'search-engine-switcher-style';
+  const ROOT_ID = 'search-engine-switcher-root';
+  const PANEL_ID = 'search-engine-switcher-panel';
 
   const DEFAULT_CONFIG = {
     engines: [
@@ -150,14 +154,16 @@
         name: 'YouTube',
         searchUrl: 'https://www.youtube.com/results?search_query={q}',
         hosts: ['youtube.com', 'm.youtube.com'],
-        hidden: true
+        hidden: true,
+        disableWidget: true
       },
       {
         id: 'github',
         name: 'GitHub',
         searchUrl: 'https://github.com/search?q={q}',
         hosts: ['github.com'],
-        hidden: true
+        hidden: true,
+        disableWidget: true
       },
       // ========== 国内社交/社区 ==========
       {
@@ -165,35 +171,40 @@
         name: '哔哩哔哩',
         searchUrl: 'https://search.bilibili.com/all?keyword={q}',
         hosts: ['search.bilibili.com', 'bilibili.com', 'www.bilibili.com'],
-        hidden: true
+        hidden: true,
+        disableWidget: true
       },
       {
         id: 'zhihu',
         name: '知乎',
         searchUrl: 'https://www.zhihu.com/search?q={q}',
         hosts: ['zhihu.com', 'www.zhihu.com'],
-        hidden: true
+        hidden: true,
+        disableWidget: true
       },
       {
         id: 'xiaohongshu',
         name: '小红书',
         searchUrl: 'https://www.xiaohongshu.com/search_result?keyword={q}',
         hosts: ['xiaohongshu.com'],
-        hidden: true
+        hidden: true,
+        disableWidget: true
       },
       {
         id: 'douyin',
         name: '抖音',
         searchUrl: 'https://www.douyin.com/search/{q}',
         hosts: ['douyin.com', 'www.douyin.com'],
-        hidden: true
+        hidden: true,
+        disableWidget: true
       },
       {
         id: 'weixin',
         name: '微信',
         searchUrl: 'https://weixin.sogou.com/weixin?type=2&s_from=input&query={q}',
         hosts: ['weixin.sogou.com'],
-        hidden: true
+        hidden: true,
+        disableWidget: true
       }
     ],
     ui: {
@@ -247,7 +258,8 @@
           name: String(e.name || '').trim(),
           searchUrl: String(e.searchUrl || '').trim(),
           hosts: Array.isArray(e.hosts) ? e.hosts.map((h) => String(h).trim()).filter(Boolean) : [],
-          hidden: !!e.hidden
+          hidden: !!e.hidden,
+          disableWidget: !!e.disableWidget
         }))
         .filter((e) => e.name && e.searchUrl.includes('{q}'));
       if (cfg.engines.length === 0) cfg.engines = deepClone(DEFAULT_CONFIG.engines);
@@ -309,71 +321,71 @@
     style.id = STYLE_ID;
     style.textContent = `
       :root {
-        --se-bg-primary: rgba(16, 16, 16, 0.92);
-        --se-bg-secondary: #101114;
-        --se-bg-input: #151820;
-        --se-bg-button: #4a4a4a;
-        --se-text-primary: #fff;
-        --se-text-secondary: #f3f3f3;
-        --se-text-muted: #9fa6b2;
-        --se-text-label: #aeb6c2;
-        --se-border-color: rgba(255, 255, 255, 0.12);
-        --se-border-light: rgba(255, 255, 255, 0.14);
-        --se-border-medium: rgba(255, 255, 255, 0.16);
-        --se-border-pill: rgba(255, 255, 255, 0.2);
-        --se-shadow: rgba(0, 0, 0, 0.32);
-        --se-shadow-panel: rgba(0, 0, 0, 0.35);
-        --se-overlay: rgba(0, 0, 0, 0.45);
-        --se-active-border: #7ea1ff;
-        --se-active-shadow: rgba(126, 161, 255, 0.35);
-        --se-primary-bg: #2e5fff;
-        --se-danger-bg: #6b2026;
-        --se-danger-border: #9f3540;
+        --ses-bg-primary: rgba(16, 16, 16, 0.92);
+        --ses-bg-secondary: #101114;
+        --ses-bg-input: #151820;
+        --ses-bg-button: #4a4a4a;
+        --ses-text-primary: #fff;
+        --ses-text-secondary: #f3f3f3;
+        --ses-text-muted: #9fa6b2;
+        --ses-text-label: #aeb6c2;
+        --ses-border-color: rgba(255, 255, 255, 0.12);
+        --ses-border-light: rgba(255, 255, 255, 0.14);
+        --ses-border-medium: rgba(255, 255, 255, 0.16);
+        --ses-border-pill: rgba(255, 255, 255, 0.2);
+        --ses-shadow: rgba(0, 0, 0, 0.32);
+        --ses-shadow-panel: rgba(0, 0, 0, 0.35);
+        --ses-overlay: rgba(0, 0, 0, 0.45);
+        --ses-active-border: #7ea1ff;
+        --ses-active-shadow: rgba(126, 161, 255, 0.35);
+        --ses-primary-bg: #2e5fff;
+        --ses-danger-bg: #6b2026;
+        --ses-danger-border: #9f3540;
       }
       [data-theme="light"] {
-        --se-bg-primary: rgba(255, 255, 255, 0.95);
-        --se-bg-secondary: #f5f5f7;
-        --se-bg-input: #ffffff;
-        --se-bg-button: #e8e8ed;
-        --se-text-primary: #1c1c1e;
-        --se-text-secondary: #2c2c2e;
-        --se-text-muted: #6c6c70;
-        --se-text-label: #3a3a3c;
-        --se-border-color: rgba(0, 0, 0, 0.1);
-        --se-border-light: rgba(0, 0, 0, 0.12);
-        --se-border-medium: rgba(0, 0, 0, 0.15);
-        --se-border-pill: rgba(0, 0, 0, 0.15);
-        --se-shadow: rgba(0, 0, 0, 0.15);
-        --se-shadow-panel: rgba(0, 0, 0, 0.2);
-        --se-overlay: rgba(0, 0, 0, 0.35);
-        --se-active-border: #007aff;
-        --se-active-shadow: rgba(0, 122, 255, 0.3);
-        --se-primary-bg: #007aff;
-        --se-danger-bg: #ff3b30;
-        --se-danger-border: #ff3b30;
+        --ses-bg-primary: rgba(255, 255, 255, 0.95);
+        --ses-bg-secondary: #f5f5f7;
+        --ses-bg-input: #ffffff;
+        --ses-bg-button: #e8e8ed;
+        --ses-text-primary: #1c1c1e;
+        --ses-text-secondary: #2c2c2e;
+        --ses-text-muted: #6c6c70;
+        --ses-text-label: #3a3a3c;
+        --ses-border-color: rgba(0, 0, 0, 0.1);
+        --ses-border-light: rgba(0, 0, 0, 0.12);
+        --ses-border-medium: rgba(0, 0, 0, 0.15);
+        --ses-border-pill: rgba(0, 0, 0, 0.15);
+        --ses-shadow: rgba(0, 0, 0, 0.15);
+        --ses-shadow-panel: rgba(0, 0, 0, 0.2);
+        --ses-overlay: rgba(0, 0, 0, 0.35);
+        --ses-active-border: #007aff;
+        --ses-active-shadow: rgba(0, 122, 255, 0.3);
+        --ses-primary-bg: #007aff;
+        --ses-danger-bg: #ff3b30;
+        --ses-danger-border: #ff3b30;
       }
       @media (prefers-color-scheme: light) {
         :root:not([data-theme="dark"]) {
-          --se-bg-primary: rgba(255, 255, 255, 0.95);
-          --se-bg-secondary: #f5f5f7;
-          --se-bg-input: #ffffff;
-          --se-bg-button: #e8e8ed;
-          --se-text-primary: #1c1c1e;
-          --se-text-secondary: #2c2c2e;
-          --se-text-muted: #6c6c70;
-          --se-text-label: #3a3a3c;
-          --se-border-color: rgba(0, 0, 0, 0.1);
-          --se-border-light: rgba(0, 0, 0, 0.12);
-          --se-border-medium: rgba(0, 0, 0, 0.15);
-          --se-border-pill: rgba(0, 0, 0, 0.15);
-          --se-shadow: rgba(0, 0, 0, 0.15);
-          --se-shadow-panel: rgba(0, 0, 0, 0.2);
-          --se-overlay: rgba(0, 0, 0, 0.35);
-          --se-active-border: #007aff;
-          --se-active-shadow: rgba(0, 122, 255, 0.3);
-          --se-primary-bg: #007aff;
-          --se-danger-bg: #ff3b30;
-          --se-danger-border: #ff3b30;
+          --ses-bg-primary: rgba(255, 255, 255, 0.95);
+          --ses-bg-secondary: #f5f5f7;
+          --ses-bg-input: #ffffff;
+          --ses-bg-button: #e8e8ed;
+          --ses-text-primary: #1c1c1e;
+          --ses-text-secondary: #2c2c2e;
+          --ses-text-muted: #6c6c70;
+          --ses-text-label: #3a3a3c;
+          --ses-border-color: rgba(0, 0, 0, 0.1);
+          --ses-border-light: rgba(0, 0, 0, 0.12);
+          --ses-border-medium: rgba(0, 0, 0, 0.15);
+          --ses-border-pill: rgba(0, 0, 0, 0.15);
+          --ses-shadow: rgba(0, 0, 0, 0.15);
+          --ses-shadow-panel: rgba(0, 0, 0, 0.2);
+          --ses-overlay: rgba(0, 0, 0, 0.35);
+          --ses-active-border: #007aff;
+          --ses-active-shadow: rgba(0, 122, 255, 0.3);
+          --ses-primary-bg: #007aff;
+          --ses-danger-bg: #ff3b30;
+          --ses-danger-border: #ff3b30;
         }
       }
       #${ROOT_ID} {
@@ -382,48 +394,56 @@
         max-width: min(96vw, 860px);
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
         user-select: none;
+        box-sizing: border-box;
       }
       #${ROOT_ID}.hidden {
         display: none;
       }
-      #${ROOT_ID} .se-wrap {
+      #${ROOT_ID} .ses-wrap {
         display: flex;
         align-items: center;
         gap: 8px;
-        background: var(--se-bg-primary);
-        border: 1px solid var(--se-border-color);
+        background: var(--ses-bg-primary);
+        border: 1px solid var(--ses-border-color);
         border-radius: 16px;
         padding: 8px;
-        box-shadow: 0 8px 26px var(--se-shadow);
+        box-shadow: 0 8px 26px var(--ses-shadow);
         backdrop-filter: blur(6px);
+        width: 100%;
+        box-sizing: border-box;
       }
-      #${ROOT_ID} .se-list {
+      #${ROOT_ID} .ses-list {
         display: flex;
         gap: 6px;
         overflow-x: auto;
         scrollbar-width: none;
         -webkit-overflow-scrolling: touch;
+        flex: 1;
+        mask-image: linear-gradient(to right, #000 calc(100% - 10px), transparent 100%);
+        -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 10px), transparent 100%);
+        padding-right: 10px;
       }
-      #${ROOT_ID} .se-list::-webkit-scrollbar {
+      #${ROOT_ID} .ses-list::-webkit-scrollbar {
         display: none;
       }
-      #${ROOT_ID} .se-pill,
-      #${ROOT_ID} .se-btn {
-        border: 1px solid var(--se-border-pill);
-        background: var(--se-bg-button);
-        color: var(--se-text-primary);
+      #${ROOT_ID} .ses-pill,
+      #${ROOT_ID} .ses-btn {
+        border: 1px solid var(--ses-border-pill);
+        background: var(--ses-bg-button);
+        color: var(--ses-text-primary);
         border-radius: 999px;
         padding: 6px 12px;
         font-size: 13px;
         line-height: 1;
         cursor: pointer;
         white-space: nowrap;
+        flex-shrink: 0;
       }
-      #${ROOT_ID} .se-pill.active {
-        border-color: var(--se-active-border);
-        box-shadow: 0 0 0 1px var(--se-active-shadow) inset;
+      #${ROOT_ID} .ses-pill.active {
+        border-color: var(--ses-active-border);
+        box-shadow: 0 0 0 1px var(--ses-active-shadow) inset;
       }
-      #${ROOT_ID} .se-btn {
+      #${ROOT_ID} .ses-btn {
         width: 34px;
         min-width: 34px;
         height: 30px;
@@ -436,7 +456,7 @@
         position: fixed;
         inset: 0;
         z-index: 2147483647;
-        background: var(--se-overlay);
+        background: var(--ses-overlay);
         display: none;
         align-items: center;
         justify-content: center;
@@ -449,11 +469,11 @@
         max-height: 90vh;
         overflow: auto;
         overscroll-behavior: contain;
-        background: var(--se-bg-secondary);
-        color: var(--se-text-secondary);
+        background: var(--ses-bg-secondary);
+        color: var(--ses-text-secondary);
         border-radius: 14px;
-        border: 1px solid var(--se-border-light);
-        box-shadow: 0 18px 48px var(--se-shadow-panel);
+        border: 1px solid var(--ses-border-light);
+        box-shadow: 0 18px 48px var(--ses-shadow-panel);
         padding: 14px;
         font-size: 14px;
       }
@@ -470,16 +490,16 @@
         grid-template-columns: 1fr auto;
         gap: 8px;
         padding: 8px;
-        border: 1px solid var(--se-border-color);
+        border: 1px solid var(--ses-border-color);
         border-radius: 10px;
         margin-bottom: 8px;
       }
       #${PANEL_ID} .engine-row.hidden-engine {
         opacity: 0.6;
-        background: var(--se-bg-button);
+        background: var(--ses-bg-button);
       }
       #${PANEL_ID} .muted {
-        color: var(--se-text-muted);
+        color: var(--ses-text-muted);
         font-size: 12px;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -500,20 +520,20 @@
       #${PANEL_ID} .danger,
       #${PANEL_ID} .ghost {
         border-radius: 8px;
-        border: 1px solid var(--se-border-medium);
-        background: var(--se-bg-button);
-        color: var(--se-text-primary);
+        border: 1px solid var(--ses-border-medium);
+        background: var(--ses-bg-button);
+        color: var(--ses-text-primary);
         padding: 6px 10px;
         cursor: pointer;
       }
       #${PANEL_ID} .primary {
-        background: var(--se-primary-bg);
-        border-color: var(--se-primary-bg);
+        background: var(--ses-primary-bg);
+        border-color: var(--ses-primary-bg);
         color: #fff;
       }
       #${PANEL_ID} .danger {
-        background: var(--se-danger-bg);
-        border-color: var(--se-danger-border);
+        background: var(--ses-danger-bg);
+        border-color: var(--ses-danger-border);
         color: #fff;
       }
       #${PANEL_ID} .ghost {
@@ -525,7 +545,7 @@
         gap: 8px;
       }
       #${PANEL_ID} .form {
-        border: 1px solid var(--se-border-color);
+        border: 1px solid var(--ses-border-color);
         border-radius: 10px;
         padding: 10px;
         margin-top: 8px;
@@ -534,15 +554,15 @@
         display: block;
         font-size: 12px;
         margin-bottom: 4px;
-        color: var(--se-text-label);
+        color: var(--ses-text-label);
       }
       #${PANEL_ID} input,
       #${PANEL_ID} select {
         width: 100%;
         box-sizing: border-box;
-        background: var(--se-bg-input);
-        border: 1px solid var(--se-border-light);
-        color: var(--se-text-primary);
+        background: var(--ses-bg-input);
+        border: 1px solid var(--ses-border-light);
+        color: var(--ses-text-primary);
         border-radius: 8px;
         padding: 6px 8px;
       }
@@ -556,7 +576,7 @@
         #${ROOT_ID} {
           max-width: 98vw;
         }
-        #${ROOT_ID} .se-pill {
+        #${ROOT_ID} .ses-pill {
           font-size: 12px;
           padding: 6px 10px;
         }
@@ -596,9 +616,16 @@
     return '';
   }
 
+  function isMatchHost(host, h) {
+    if (h.endsWith('.')) {
+      return host === h.slice(0, -1) || host.startsWith(h) || host.includes('.' + h);
+    }
+    return host === h || host.endsWith('.' + h);
+  }
+
   function activeEngineIdByHost() {
     const host = location.hostname;
-    const exact = config.engines.find((e) => (e.hosts || []).some((h) => host.includes(h)));
+    const exact = config.engines.find((e) => (e.hosts || []).some((h) => isMatchHost(host, h)));
     return exact ? exact.id : '';
   }
 
@@ -658,20 +685,29 @@
     root = document.createElement('div');
     root.id = ROOT_ID;
     root.innerHTML = `
-      <div class="se-wrap">
-        <div class="se-list" id="${ROOT_ID}-list"></div>
-        <button class="se-btn" id="${ROOT_ID}-settings" title="设置">⚙</button>
+      <div class="ses-wrap">
+        <div class="ses-list" id="${ROOT_ID}-list"></div>
+        <button class="ses-btn" id="${ROOT_ID}-settings" title="设置">⚙</button>
       </div>
     `;
     document.documentElement.appendChild(root);
     applyRootPosition(root);
+
+    const list = root.querySelector(`#${ROOT_ID}-list`);
+    // 支持鼠标滚轮横向滚动（针对桌面端）
+    list.addEventListener('wheel', (e) => {
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        list.scrollLeft += e.deltaY;
+      }
+    }, { passive: false });
 
     const settingsBtn = root.querySelector(`#${ROOT_ID}-settings`);
     settingsBtn.addEventListener('click', () => openPanel());
 
     let holdTimer = null;
     root.addEventListener('pointerdown', (e) => {
-      if (e.target && e.target.closest('.se-pill')) return;
+      if (e.target && e.target.closest('.ses-pill')) return;
       holdTimer = setTimeout(() => openPanel(), 500);
     });
     root.addEventListener('pointerup', () => {
@@ -688,8 +724,8 @@
 
   function isSearchPage() {
     const host = location.hostname;
-    const isSearchEngine = config.engines.some((e) => (e.hosts || []).some((h) => host.includes(h)));
-    if (!isSearchEngine) return false;
+    const currentEngine = config.engines.find((e) => (e.hosts || []).some((h) => isMatchHost(host, h)));
+    if (!currentEngine || currentEngine.disableWidget) return false;
     const query = getCurrentQuery();
     return !!query;
   }
@@ -699,10 +735,10 @@
     const list = root.querySelector(`#${ROOT_ID}-list`);
     list.innerHTML = '';
 
-    // 只在搜索引擎页面上显示
+    // 只在未禁用的搜索引擎页面上显示
     const host = location.hostname;
-    const isSearchEngine = config.engines.some((e) => (e.hosts || []).some((h) => host.includes(h)));
-    if (!isSearchEngine) {
+    const currentEngine = config.engines.find((e) => (e.hosts || []).some((h) => isMatchHost(host, h)));
+    if (!currentEngine || currentEngine.disableWidget) {
       root.classList.add('hidden');
       return;
     }
@@ -720,20 +756,43 @@
     for (const engine of config.engines) {
       if (engine.hidden) continue;
       const btn = document.createElement('button');
-      btn.className = 'se-pill';
+      btn.className = 'ses-pill';
       if (engine.id === activeId) btn.classList.add('active');
       btn.textContent = engine.name;
       btn.title = `${engine.name}\n${engine.searchUrl}`;
-      btn.addEventListener('click', async () => {
+      
+      const handleAction = async (openInNewTabOverride) => {
         const query = await resolveQuery();
         if (!query) return;
         const url = buildSearchUrl(engine, query);
-        if (config.ui.openInNewTab) {
+        const shouldOpenNewTab = openInNewTabOverride !== undefined ? openInNewTabOverride : config.ui.openInNewTab;
+        if (shouldOpenNewTab) {
           window.open(url, '_blank');
         } else {
           location.href = url;
         }
+      };
+
+      btn.addEventListener('click', (e) => {
+        if (e.button === 0) { // 左键
+          handleAction();
+        }
       });
+
+      // 阻止中键默认的自动滚动行为
+      btn.addEventListener('mousedown', (e) => {
+        if (e.button === 1) {
+          e.preventDefault();
+        }
+      });
+
+      btn.addEventListener('mouseup', (e) => {
+        if (e.button === 1) { // 中键
+          e.preventDefault();
+          handleAction(true); // 强制新标签页打开
+        }
+      });
+
       list.appendChild(btn);
     }
   }
@@ -826,6 +885,59 @@
     renderEngineButtons();
   }
 
+  function toggleWidgetVisibility(index) {
+    const engine = config.engines[index];
+    if (!engine) return;
+    engine.disableWidget = !engine.disableWidget;
+    saveConfig(config);
+    renderPanel();
+    renderEngineButtons();
+  }
+
+  function exportConfig() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(config, null, 2));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "search-engine-switcher-config.json");
+    document.body.appendChild(downloadAnchorNode); // required for firefox
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+  }
+
+  function importConfig() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/json';
+    input.onchange = e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = event => {
+        try {
+          const importedData = JSON.parse(event.target.result);
+          const mergedConfig = mergeConfig(importedData);
+          
+          if (!confirm('确定要覆盖当前配置吗？此操作不可逆！')) return;
+          
+          Object.assign(config, mergedConfig);
+          saveConfig(config);
+          
+          applyRootPosition(createRoot());
+          applyTheme();
+          renderEngineButtons();
+          renderPanel();
+          
+          alert('配置导入成功！');
+        } catch (error) {
+          alert('配置导入失败：无效的 JSON 格式或数据结构。');
+          console.error('Import Config Error:', error);
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  }
+
   function startDragPositioning() {
     const root = createRoot();
     config.ui.useCustomXY = true;
@@ -843,7 +955,7 @@
     let originY = config.ui.customY;
 
     function onDown(e) {
-      if (e.target && e.target.closest('.se-pill')) return;
+      if (e.target && e.target.closest('.ses-pill')) return;
       dragging = true;
       startX = e.clientX;
       startY = e.clientY;
@@ -883,15 +995,16 @@
         (e, i) => `
       <div class="engine-row ${e.hidden ? 'hidden-engine' : ''}" data-index="${i}">
         <div>
-          <div><strong>${escapeHtml(e.name)}${e.hidden ? ' <span class="muted">(已隐藏)</span>' : ''}</strong></div>
+          <div><strong>${escapeHtml(e.name)}${e.hidden ? ' <span class="muted">(按钮已隐藏)</span>' : ''}${e.disableWidget ? ' <span class="muted" style="color:var(--ses-danger-border);">(本站禁用悬浮)</span>' : ''}</strong></div>
           <div class="muted">${escapeHtml(e.searchUrl)}</div>
           <div class="muted">识别域名: ${escapeHtml((e.hosts || []).join(', ') || '(空)')}</div>
         </div>
-        <div class="ops">
+        <div class="ops" style="flex-wrap: wrap;">
           <button class="op" data-act="up">↑</button>
           <button class="op" data-act="down">↓</button>
           <button class="op" data-act="edit">编辑</button>
-          <button class="op" data-act="${e.hidden ? 'show' : 'hide'}">${e.hidden ? '显示' : '隐藏'}</button>
+          <button class="op" data-act="${e.hidden ? 'show' : 'hide'}" title="在切换器面板中显示或隐藏该按钮">${e.hidden ? '显示按钮' : '隐藏按钮'}</button>
+          <button class="op" data-act="toggle-widget" title="是否在该搜索引擎的网页中注入并显示悬浮控件">${e.disableWidget ? '启用悬浮' : '禁用悬浮'}</button>
           <button class="danger" data-act="del">删除</button>
         </div>
       </div>
@@ -904,35 +1017,40 @@
 
       <div class="sub" style="display:flex; justify-content:space-between; align-items:center;">
         <span>引擎列表（支持新增 / 删除 / 排序 / 隐藏）</span>
-        <button class="ghost" id="se-reset-engines" style="padding:4px 8px; font-size:12px;">恢复默认</button>
+        <div style="display:flex; gap:8px;">
+          <button class="primary" id="ses-show-guide" style="padding:4px 8px; font-size:12px;">使用指南</button>
+          <button class="ghost" id="ses-reset-engines" style="padding:4px 8px; font-size:12px;">恢复默认</button>
+        </div>
       </div>
       <div>${engineRows}</div>
-      <div style="margin-top:8px;">
-        <button class="primary" id="se-add">新增搜索引擎</button>
+      <div style="margin-top:8px; display:flex; gap:8px;">
+        <button class="primary" id="ses-add">新增搜索引擎</button>
+        <button class="ghost" id="ses-export">导出配置</button>
+        <button class="ghost" id="ses-import">导入配置</button>
       </div>
 
       <div class="sub" style="display:flex; justify-content:space-between; align-items:center;">
         <span>显示位置</span>
-        <button class="ghost" id="se-reset-position" style="padding:4px 8px; font-size:12px;">恢复默认</button>
+        <button class="ghost" id="ses-reset-position" style="padding:4px 8px; font-size:12px;">恢复默认</button>
       </div>
       <div class="grid2">
         <div>
           <label>定位模式</label>
-          <select id="se-pos-mode">
+          <select id="ses-pos-mode">
             <option value="preset" ${!config.ui.useCustomXY ? 'selected' : ''}>预设位置</option>
             <option value="custom" ${config.ui.useCustomXY ? 'selected' : ''}>自定义坐标</option>
           </select>
         </div>
         <div>
           <label>垂直位置</label>
-          <select id="se-vertical">
+          <select id="ses-vertical">
             <option value="bottom" ${config.ui.vertical === 'bottom' ? 'selected' : ''}>底部</option>
             <option value="top" ${config.ui.vertical === 'top' ? 'selected' : ''}>顶部</option>
           </select>
         </div>
         <div>
           <label>水平对齐</label>
-          <select id="se-align">
+          <select id="ses-align">
             <option value="left" ${config.ui.align === 'left' ? 'selected' : ''}>左</option>
             <option value="center" ${config.ui.align === 'center' ? 'selected' : ''}>中</option>
             <option value="right" ${config.ui.align === 'right' ? 'selected' : ''}>右</option>
@@ -940,47 +1058,47 @@
         </div>
         <div>
           <label>水平偏移(px)</label>
-          <input type="number" id="se-offset-x" value="${Number(config.ui.offsetX) || 0}" min="0" step="1" />
+          <input type="number" id="ses-offset-x" value="${Number(config.ui.offsetX) || 0}" min="0" step="1" />
         </div>
         <div>
           <label>垂直偏移(px)</label>
-          <input type="number" id="se-offset-y" value="${Number(config.ui.offsetY) || 0}" min="0" step="1" />
+          <input type="number" id="ses-offset-y" value="${Number(config.ui.offsetY) || 0}" min="0" step="1" />
         </div>
         <div>
           <label>自定义 X(px)</label>
-          <input type="number" id="se-custom-x" value="${Number(config.ui.customX) || 0}" min="0" step="1" />
+          <input type="number" id="ses-custom-x" value="${Number(config.ui.customX) || 0}" min="0" step="1" />
         </div>
         <div>
           <label>自定义 Y(px)</label>
-          <input type="number" id="se-custom-y" value="${Number(config.ui.customY) || 0}" min="0" step="1" />
+          <input type="number" id="ses-custom-y" value="${Number(config.ui.customY) || 0}" min="0" step="1" />
         </div>
       </div>
       <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
-        <button class="op" id="se-drag">拖拽定位</button>
+        <button class="op" id="ses-drag">拖拽定位</button>
       </div>
 
       <div class="sub" style="display:flex; justify-content:space-between; align-items:center;">
         <span>行为选项</span>
-        <button class="ghost" id="se-reset-behavior" style="padding:4px 8px; font-size:12px;">恢复默认</button>
+        <button class="ghost" id="ses-reset-behavior" style="padding:4px 8px; font-size:12px;">恢复默认</button>
       </div>
       <div class="grid2">
         <div>
           <label>无关键词时</label>
-          <select id="se-show-no-query">
+          <select id="ses-show-no-query">
             <option value="1" ${config.ui.showWhenNoQuery ? 'selected' : ''}>仍然显示切换器</option>
             <option value="0" ${!config.ui.showWhenNoQuery ? 'selected' : ''}>隐藏切换器</option>
           </select>
         </div>
         <div>
           <label>打开方式</label>
-          <select id="se-open-way">
+          <select id="ses-open-way">
             <option value="0" ${!config.ui.openInNewTab ? 'selected' : ''}>当前标签页</option>
             <option value="1" ${config.ui.openInNewTab ? 'selected' : ''}>新标签页</option>
           </select>
         </div>
         <div>
           <label>主题模式</label>
-          <select id="se-theme">
+          <select id="ses-theme">
             <option value="auto" ${config.ui.theme === 'auto' ? 'selected' : ''}>跟随系统</option>
             <option value="light" ${config.ui.theme === 'light' ? 'selected' : ''}>浅色</option>
             <option value="dark" ${config.ui.theme === 'dark' ? 'selected' : ''}>深色</option>
@@ -989,8 +1107,8 @@
       </div>
 
       <div class="panel-footer">
-        <button class="ghost" id="se-close">关闭</button>
-        <button class="primary" id="se-save">保存设置</button>
+        <button class="ghost" id="ses-close">关闭</button>
+        <button class="primary" id="ses-save">保存设置</button>
       </div>
     `;
 
@@ -1009,13 +1127,17 @@
         if (act === 'edit') editEngine(config.engines[index]);
         if (act === 'del') deleteEngine(index);
         if (act === 'hide' || act === 'show') toggleEngineVisibility(index);
+        if (act === 'toggle-widget') toggleWidgetVisibility(index);
       });
     });
 
-    panel.querySelector('#se-add').addEventListener('click', () => editEngine(null));
+    panel.querySelector('#ses-add').addEventListener('click', () => editEngine(null));
+    panel.querySelector('#ses-export').addEventListener('click', exportConfig);
+    panel.querySelector('#ses-import').addEventListener('click', importConfig);
+    panel.querySelector('#ses-show-guide').addEventListener('click', () => showOfflineGuide());
 
     // 恢复默认 - 引擎列表
-    panel.querySelector('#se-reset-engines').addEventListener('click', () => {
+    panel.querySelector('#ses-reset-engines').addEventListener('click', () => {
       if (!confirm('确定恢复默认搜索引擎列表吗？')) return;
       const reset = deepClone(DEFAULT_CONFIG);
       config.engines = reset.engines;
@@ -1025,7 +1147,7 @@
     });
 
     // 恢复默认 - 显示位置
-    panel.querySelector('#se-reset-position').addEventListener('click', () => {
+    panel.querySelector('#ses-reset-position').addEventListener('click', () => {
       if (!confirm('确定恢复默认显示位置吗？')) return;
       const reset = deepClone(DEFAULT_CONFIG);
       config.ui.vertical = reset.ui.vertical;
@@ -1041,7 +1163,7 @@
     });
 
     // 恢复默认 - 行为选项
-    panel.querySelector('#se-reset-behavior').addEventListener('click', () => {
+    panel.querySelector('#ses-reset-behavior').addEventListener('click', () => {
       if (!confirm('确定恢复默认行为选项吗？')) return;
       const reset = deepClone(DEFAULT_CONFIG);
       config.ui.showWhenNoQuery = reset.ui.showWhenNoQuery;
@@ -1052,23 +1174,23 @@
       renderPanel();
     });
 
-    panel.querySelector('#se-drag').addEventListener('click', () => {
+    panel.querySelector('#ses-drag').addEventListener('click', () => {
       closePanel();
       startDragPositioning();
     });
 
-    panel.querySelector('#se-close').addEventListener('click', closePanel);
-    panel.querySelector('#se-save').addEventListener('click', () => {
-      const posMode = panel.querySelector('#se-pos-mode').value;
-      const vertical = panel.querySelector('#se-vertical').value;
-      const align = panel.querySelector('#se-align').value;
-      const offsetX = Number(panel.querySelector('#se-offset-x').value) || 0;
-      const offsetY = Number(panel.querySelector('#se-offset-y').value) || 0;
-      const customX = Number(panel.querySelector('#se-custom-x').value) || 0;
-      const customY = Number(panel.querySelector('#se-custom-y').value) || 0;
-      const showNoQuery = panel.querySelector('#se-show-no-query').value === '1';
-      const openInNewTab = panel.querySelector('#se-open-way').value === '1';
-      const theme = panel.querySelector('#se-theme').value;
+    panel.querySelector('#ses-close').addEventListener('click', closePanel);
+    panel.querySelector('#ses-save').addEventListener('click', () => {
+      const posMode = panel.querySelector('#ses-pos-mode').value;
+      const vertical = panel.querySelector('#ses-vertical').value;
+      const align = panel.querySelector('#ses-align').value;
+      const offsetX = Number(panel.querySelector('#ses-offset-x').value) || 0;
+      const offsetY = Number(panel.querySelector('#ses-offset-y').value) || 0;
+      const customX = Number(panel.querySelector('#ses-custom-x').value) || 0;
+      const customY = Number(panel.querySelector('#ses-custom-y').value) || 0;
+      const showNoQuery = panel.querySelector('#ses-show-no-query').value === '1';
+      const openInNewTab = panel.querySelector('#ses-open-way').value === '1';
+      const theme = panel.querySelector('#ses-theme').value;
 
       config.ui.useCustomXY = posMode === 'custom';
       config.ui.vertical = vertical === 'top' ? 'top' : 'bottom';
@@ -1121,6 +1243,94 @@
     overlay.classList.remove('show');
   }
 
+  function showOfflineGuide() {
+    const guideHtml = `
+      <!DOCTYPE html>
+      <html lang="zh-CN">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Search Engine Switcher 使用指南</title>
+        <style>
+          body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+          }
+          .container {
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          }
+          h1 { color: #2e5fff; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+          h2 { color: #444; margin-top: 30px; }
+          ul, ol { padding-left: 20px; }
+          li { margin-bottom: 10px; }
+          .highlight { background-color: #ffeeba; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+          .btn {
+            display: inline-block;
+            background-color: #2e5fff;
+            color: #fff;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+          }
+          .btn:hover { background-color: #1c45d8; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>🎉 欢迎使用 Search Engine Switcher (v${CURRENT_VERSION})</h1>
+          <p>感谢您安装本脚本！为了让您更好地使用，请花 1 分钟阅读以下指南：</p>
+
+          <h2>👀 悬浮窗去哪了？为什么不显示？</h2>
+          <p>这是最常见的问题。请注意，悬浮控件<span class="highlight">默认只会在搜索引擎的搜索结果页面显示</span>！</p>
+          <ul>
+            <li>如果您在普通的网页（如百度百科、普通新闻网站等），悬浮窗是<strong>不会出现</strong>的。</li>
+            <li>只有当您打开了如 <strong>Google、Bing、百度</strong> 等搜索引擎的网页时，它才会出现在页面底部。</li>
+          </ul>
+
+          <h2>🖱️ 基础操作</h2>
+          <ul>
+            <li><strong>左键点击：</strong> 直接在当前页面（或根据设置在新标签页）切换到目标搜索引擎。</li>
+            <li><strong>鼠标中键点击：</strong> 强制在<span class="highlight">新标签页</span>中打开搜索结果。</li>
+            <li><strong>长按悬浮窗 (或点击 ⚙ 按钮)：</strong> 打开设置面板。</li>
+          </ul>
+
+          <h2>🚫 为什么 B站/YouTube 也会有悬浮窗？怎么关掉？</h2>
+          <p>脚本预设了一些社交/视频类搜索（如 B站、YouTube、知乎）。如果在刷视频时悬浮窗影响了您的体验，您可以：</p>
+          <ol>
+            <li>打开脚本的<strong>设置面板</strong>。</li>
+            <li>在引擎列表中找到对应的网站（例如“哔哩哔哩”）。</li>
+            <li>点击列表右侧的 <strong>“禁用悬浮”</strong> 按钮（如果已经是禁用状态则会显示“本站禁用悬浮”红字）。</li>
+          </ol>
+          <p>这样，该网站就不会再出现悬浮窗了！</p>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const blob = new Blob([guideHtml], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+  }
+
+  function checkFirstInstallOrUpdate() {
+    const lastVersion = safeGMGet(VERSION_KEY, null);
+    if (lastVersion !== CURRENT_VERSION) {
+      safeGMSet(VERSION_KEY, CURRENT_VERSION);
+      // 只在安装/更新后的第一次自动弹出
+      showOfflineGuide();
+    }
+  }
+
   function escapeHtml(text) {
     return String(text)
       .replace(/&/g, '&amp;')
@@ -1131,6 +1341,7 @@
   }
 
   function init() {
+    checkFirstInstallOrUpdate();
     injectStyle();
     applyTheme();
     createRoot();
