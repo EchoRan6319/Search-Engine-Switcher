@@ -4,6 +4,9 @@
 // @version      2.3.0
 // @description  快捷搜索引擎切换器：支持新增、删除、排序、位置自定义
 // @author       EchoRan6319
+// @license      MIT
+// @homepageURL  https://github.com/EchoRan6319/Search-Engine-Switcher
+// @supportURL   https://github.com/EchoRan6319/Search-Engine-Switcher/issues
 // @match        *://*/*
 // @grant        GM_getValue
 // @grant        GM_setValue
