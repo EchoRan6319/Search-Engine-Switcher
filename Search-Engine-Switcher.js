@@ -1,7 +1,7 @@
-﻿// ==UserScript==
+// ==UserScript==
 // @name         Search Engine Switcher
 // @namespace    https://github.com/EchoRan6319/Search-Engine-Switcher
-// @version      2.3.0
+// @version      2.4.0
 // @description  快捷搜索引擎切换器：支持新增、删除、排序、位置自定义
 // @author       EchoRan6319
 // @license      MIT
@@ -21,7 +21,7 @@
 
   const STORAGE_KEY = 'search_engine_switcher_config_v1';
   const VERSION_KEY = 'search_engine_switcher_version';
-  const CURRENT_VERSION = '2.3.0';
+  const CURRENT_VERSION = '2.4.0';
   const STYLE_ID = 'search-engine-switcher-style';
   const ROOT_ID = 'search-engine-switcher-root';
   const PANEL_ID = 'search-engine-switcher-panel';
@@ -73,13 +73,6 @@
         hidden: false
       },
       {
-        id: 'quark',
-        name: '夸克',
-        searchUrl: 'https://quark.sm.cn/s?q={q}',
-        hosts: ['quark.sm.cn', 'sm.cn'],
-        hidden: true
-      },
-      {
         id: 'sogou',
         name: '搜狗',
         searchUrl: 'https://www.sogou.com/web?query={q}',
@@ -118,9 +111,9 @@
       // ========== 国内AI大模型 ==========
       {
         id: 'qianwen',
-        name: '通义千问',
-        searchUrl: 'https://tongyi.aliyun.com/qianwen/?q={q}',
-        hosts: ['tongyi.aliyun.com'],
+        name: '千问',
+        searchUrl: 'https://www.qianwen.com/?q={q}',
+        hosts: ['qianwen.com', 'www.qianwen.com'],
         hidden: true
       },
       {
@@ -300,21 +293,22 @@
 
   const config = loadConfig();
 
+  function isLightTheme() {
+    const theme = config.ui.theme || 'auto';
+    if (theme === 'light') return true;
+    if (theme === 'dark') return false;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+  }
+
   function applyTheme() {
     const theme = config.ui.theme || 'auto';
     const root = document.documentElement;
-    if (theme === 'light') {
-      root.setAttribute('data-theme', 'light');
-    } else if (theme === 'dark') {
+    if (theme === 'dark') {
       root.removeAttribute('data-theme');
+    } else if (isLightTheme()) {
+      root.setAttribute('data-theme', 'light');
     } else {
-      // auto: follow system preference
-      const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-      if (prefersLight) {
-        root.setAttribute('data-theme', 'light');
-      } else {
-        root.removeAttribute('data-theme');
-      }
+      root.removeAttribute('data-theme');
     }
   }
 
@@ -346,6 +340,7 @@
         --ses-danger-border: #9f3540;
       }
       [data-theme="light"] {
+        color-scheme: light;
         --ses-bg-primary: rgba(255, 255, 255, 0.95);
         --ses-bg-secondary: #f5f5f7;
         --ses-bg-input: #ffffff;
@@ -369,6 +364,7 @@
       }
       @media (prefers-color-scheme: light) {
         :root:not([data-theme="dark"]) {
+          color-scheme: light;
           --ses-bg-primary: rgba(255, 255, 255, 0.95);
           --ses-bg-secondary: #f5f5f7;
           --ses-bg-input: #ffffff;
@@ -398,6 +394,7 @@
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
         user-select: none;
         box-sizing: border-box;
+        forced-color-adjust: none;
       }
       #${ROOT_ID}.hidden {
         display: none;
@@ -443,8 +440,7 @@
         flex-shrink: 0;
       }
       #${ROOT_ID} .ses-pill.active {
-        border-color: var(--ses-active-border);
-        box-shadow: 0 0 0 1px var(--ses-active-shadow) inset;
+        /* 激活描边由 JS inline style 控制，以防止 Dark Reader 篡改 */
       }
       #${ROOT_ID} .ses-btn {
         width: 34px;
@@ -632,9 +628,6 @@
     return exact ? exact.id : '';
   }
 
-  function getEngineById(id) {
-    return config.engines.find((e) => e.id === id) || null;
-  }
 
   function buildSearchUrl(engine, query) {
     return engine.searchUrl.replace('{q}', encodeURIComponent(query));
@@ -725,13 +718,6 @@
     return root;
   }
 
-  function isSearchPage() {
-    const host = location.hostname;
-    const currentEngine = config.engines.find((e) => (e.hosts || []).some((h) => isMatchHost(host, h)));
-    if (!currentEngine || currentEngine.disableWidget) return false;
-    const query = getCurrentQuery();
-    return !!query;
-  }
 
   function renderEngineButtons() {
     const root = createRoot();
@@ -760,7 +746,15 @@
       if (engine.hidden) continue;
       const btn = document.createElement('button');
       btn.className = 'ses-pill';
-      if (engine.id === activeId) btn.classList.add('active');
+      if (engine.id === activeId) {
+        btn.classList.add('active');
+        // 用 inline style 强制设置描边，绕过 Dark Reader 对 CSS 规则的修改
+        const light = isLightTheme();
+        const borderColor = light ? '#007aff' : '#7ea1ff';
+        const shadowColor = light ? 'rgba(0, 122, 255, 0.3)' : 'rgba(126, 161, 255, 0.35)';
+        btn.style.setProperty('border-color', borderColor, 'important');
+        btn.style.setProperty('box-shadow', `0 0 0 1px ${shadowColor} inset`, 'important');
+      }
       btn.textContent = engine.name;
       btn.title = `${engine.name}\n${engine.searchUrl}`;
       

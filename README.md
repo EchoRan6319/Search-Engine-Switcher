@@ -37,12 +37,12 @@
 - 🖱️ **灵活打开** - 左键切换，中键强制新标签页打开
 - 🎯 **智能显示** - 仅在搜索引擎页面显示，支持单站点禁用
 
-### 支持的搜索引擎 (22+)
+### 支持的搜索引擎 (21+)
 
 | 类型 | 搜索引擎 |
 |------|----------|
-| 传统搜索 | Google, Bing, 百度, DuckDuckGo, Brave, Yandex, 搜狗, 夸克, 360搜索 |
-| AI 大模型 | ChatGPT, Perplexity, Gemini, 通义千问, 豆包, DeepSeek, Kimi, 秘塔AI |
+| 传统搜索 | Google, Bing, 百度, DuckDuckGo, Brave, Yandex, 搜狗, 360搜索 |
+| AI 大模型 | ChatGPT, Perplexity, Gemini, 千问, 豆包, DeepSeek, Kimi, 秘塔AI |
 | 社交/社区 | YouTube, GitHub, 哔哩哔哩, 知乎, 小红书, 抖音, 微信 |
 
 
@@ -73,7 +73,7 @@ Search-Engine-Switcher.js
 ├── 配置管理 (GM_getValue/GM_setValue)
 ├── 搜索引擎检测 (域名匹配)
 ├── 搜索词提取 (URL 参数解析)
-├── UI 渲染 (Shadow DOM 隔离)
+├── UI 渲染 (注入式 CSS + 固定定位)
 ├── 事件处理 (点击/长按/拖拽)
 └── 初始化
 ```
@@ -84,9 +84,10 @@ Search-Engine-Switcher.js
 ```javascript
 function activeEngineIdByHost() {
   const host = location.hostname;
-  return config.engines.find((e) =>
-    (e.hosts || []).some((h) => host.includes(h))
-  )?.id;
+  const exact = config.engines.find((e) =>
+    (e.hosts || []).some((h) => isMatchHost(host, h))
+  );
+  return exact ? exact.id : '';
 }
 ```
 
@@ -94,9 +95,8 @@ function activeEngineIdByHost() {
 ```javascript
 function getCurrentQuery() {
   const url = new URL(location.href);
-  const params = url.searchParams;
-  for (const key of ['q', 'query', 'wd', 'keyword', 'search_query', 'text']) {
-    const val = params.get(key);
+  for (const key of ['q', 'wd', 'word', 'query', 'text', 'keyword', 'search', 'p', 'k']) {
+    const val = url.searchParams.get(key);
     if (val) return val.trim();
   }
   return '';
@@ -111,6 +111,12 @@ function getCurrentQuery() {
 - ✅ 浅色/深色主题
 
 ## 📜 更新日志
+
+### v2.4.0
+- 通义千问更名为「千问」，更新搜索地址至 `qianwen.com`
+- 移除夸克预设（夸克/神马搜索均无 PC Web 搜索界面）
+- 修复深色模式下激活按钮描边被 Dark Reader 篡改的问题
+- 代码清理：移除冗余函数与死代码
 
 ### v2.3.0
 - 新增配置导入导出功能
