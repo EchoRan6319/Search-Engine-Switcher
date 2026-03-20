@@ -8,7 +8,7 @@
 
 ### 方式一：Greasy Fork（推荐）
 
-👉 [点击安装](https://greasyfork.org/zh-CN/scripts/570395-search-engine-switcher)
+👉 [点击安装(中国大陆用户)](https://gf.qytechs.cn/zh-CN/scripts/570395-search-engine-switcher)👉 [点击安装](https://greasyfork.org/zh-CN/scripts/570395-search-engine-switcher)
 
 ### 方式二：手动安装
 
