@@ -4,10 +4,27 @@
 [![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
 [![Tampermonkey](https://img.shields.io/badge/Tampermonkey-✓-green?style=flat-square)](https://www.tampermonkey.net/)
 
-> 一个快捷切换浏览器搜索引擎的油猴脚本，让你在任何网页都能快速切换搜索引擎。
+## 🚀 安装
+
+### 方式一：Greasy Fork（推荐）
+
+👉 [点击安装](https://greasyfork.org/zh-CN/scripts/570395-search-engine-switcher)
+
+### 方式二：手动安装
+
+1. 安装脚本管理器：[Tampermonkey](https://www.tampermonkey.net/) 或 [Greasemonkey](https://addons.mozilla.org/firefox/addon/greasemonkey/)
+2. 点击 [Search-Engine-Switcher.js](./Search-Engine-Switcher.js) → "Raw"
+3. 脚本管理器会自动提示安装
+
+## 📸 界面展示
 
 <p align="center">
-  <img src="./images/浅色模式.png" width="600" alt="浅色模式主界面">
+  <img src="./images/浅色模式.png" width="45%" alt="浅色模式">
+  <img src="./images/深色模式.png" width="45%" alt="深色模式">
+</p>
+<p align="center">
+  <img src="./images/新设置页1.png" width="45%" alt="设置面板-引擎列表">
+  <img src="./images/新设置页2.png" width="45%" alt="设置面板-显示位置">
 </p>
 
 ## ✨ 功能特性
@@ -28,30 +45,8 @@
 | AI 大模型 | ChatGPT, Perplexity, Gemini, 通义千问, 豆包, DeepSeek, Kimi, 秘塔AI |
 | 社交/社区 | YouTube, GitHub, 哔哩哔哩, 知乎, 小红书, 抖音, 微信 |
 
-## 📸 界面展示
 
-<p align="center">
-  <img src="./images/浅色模式.png" width="45%" alt="浅色模式">
-  <img src="./images/深色模式.png" width="45%" alt="深色模式">
-</p>
-<p align="center">
-  <img src="./images/新设置页1.png" width="45%" alt="设置面板-引擎列表">
-  <img src="./images/新设置页2.png" width="45%" alt="设置面板-显示位置">
-</p>
-
-## 🚀 安装
-
-### 方式一：Greasy Fork（推荐）
-
-👉 [点击安装](https://greasyfork.org/zh-CN/scripts/570395-search-engine-switcher)
-
-### 方式二：手动安装
-
-1. 安装脚本管理器：[Tampermonkey](https://www.tampermonkey.net/) 或 [Greasemonkey](https://addons.mozilla.org/firefox/addon/greasemonkey/)
-2. 点击 [Search-Engine-Switcher.js](./Search-Engine-Switcher.js) → "Raw"
-3. 脚本管理器会自动提示安装
-
-## 📖 使用方法
+##  使用方法
 
 ### 基本操作
 
