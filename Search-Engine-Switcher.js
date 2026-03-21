@@ -1,7 +1,7 @@
-// ==UserScript==
+﻿// ==UserScript==
 // @name         Search Engine Switcher
 // @namespace    https://github.com/EchoRan6319/Search-Engine-Switcher
-// @version      2.4.0
+// @version      2.5.0
 // @description  快捷搜索引擎切换器：支持新增、删除、排序、位置自定义
 // @author       EchoRan6319
 // @license      MIT
@@ -21,7 +21,7 @@
 
   const STORAGE_KEY = 'search_engine_switcher_config_v1';
   const VERSION_KEY = 'search_engine_switcher_version';
-  const CURRENT_VERSION = '2.4.0';
+  const CURRENT_VERSION = '2.5.0';
   const STYLE_ID = 'search-engine-switcher-style';
   const ROOT_ID = 'search-engine-switcher-root';
   const PANEL_ID = 'search-engine-switcher-panel';
