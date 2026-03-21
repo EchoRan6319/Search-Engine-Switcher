@@ -580,6 +580,22 @@
           font-size: 12px;
           padding: 6px 10px;
         }
+        #${PANEL_ID} .engine-row {
+          display: flex;
+          flex-direction: column;
+        }
+        #${PANEL_ID} .ops {
+          justify-content: flex-start;
+        }
+        #${PANEL_ID} .op,
+        #${PANEL_ID} .danger {
+          padding: 7px 10px;
+          min-width: 52px;
+          text-align: center;
+        }
+        #${PANEL_ID} .grid2 {
+          grid-template-columns: 1fr;
+        }
       }
     `;
     document.documentElement.appendChild(style);
@@ -945,6 +961,7 @@
     alert('拖动切换器到你想要的位置，松开后自动保存');
 
     root.style.cursor = 'move';
+    root.style.touchAction = 'none';
 
     let dragging = false;
     let startX = 0;
@@ -959,6 +976,9 @@
       startY = e.clientY;
       originX = config.ui.customX;
       originY = config.ui.customY;
+      if (e.target.setPointerCapture) {
+        e.target.setPointerCapture(e.pointerId);
+      }
       document.addEventListener('pointermove', onMove);
       document.addEventListener('pointerup', onUp);
       e.preventDefault();
@@ -971,11 +991,15 @@
       applyRootPosition(root);
     }
 
-    function onUp() {
+    function onUp(e) {
       dragging = false;
       saveConfig(config);
       renderPanel();
       root.style.cursor = '';
+      root.style.touchAction = '';
+      if (e && e.target && e.target.releasePointerCapture) {
+        try { e.target.releasePointerCapture(e.pointerId); } catch (_) {}
+      }
       root.removeEventListener('pointerdown', onDown);
       document.removeEventListener('pointermove', onMove);
       document.removeEventListener('pointerup', onUp);
