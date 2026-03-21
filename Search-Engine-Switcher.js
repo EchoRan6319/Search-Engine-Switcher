@@ -1,7 +1,7 @@
-﻿// ==UserScript==
+// ==UserScript==
 // @name         Search Engine Switcher
 // @namespace    https://github.com/EchoRan6319/Search-Engine-Switcher
-// @version      2.5.0
+// @version      2.5.1
 // @description  快捷搜索引擎切换器：支持新增、删除、排序、位置自定义
 // @author       EchoRan6319
 // @license      MIT
@@ -21,7 +21,7 @@
 
   const STORAGE_KEY = 'search_engine_switcher_config_v1';
   const VERSION_KEY = 'search_engine_switcher_version';
-  const CURRENT_VERSION = '2.5.0';
+  const CURRENT_VERSION = '2.5.1';
   const STYLE_ID = 'search-engine-switcher-style';
   const ROOT_ID = 'search-engine-switcher-root';
   const PANEL_ID = 'search-engine-switcher-panel';
@@ -774,7 +774,7 @@
       }
       btn.textContent = engine.name;
       btn.title = `${engine.name}\n${engine.searchUrl}`;
-      
+
       const handleAction = async (openInNewTabOverride) => {
         const query = await resolveQuery();
         if (!query) return;
@@ -930,17 +930,17 @@
         try {
           const importedData = JSON.parse(event.target.result);
           const mergedConfig = mergeConfig(importedData);
-          
+
           if (!confirm('确定要覆盖当前配置吗？此操作不可逆！')) return;
-          
+
           Object.assign(config, mergedConfig);
           saveConfig(config);
-          
+
           applyRootPosition(createRoot());
           applyTheme();
           renderEngineButtons();
           renderPanel();
-          
+
           alert('配置导入成功！');
         } catch (error) {
           alert('配置导入失败：无效的 JSON 格式或数据结构。');
@@ -998,7 +998,7 @@
       root.style.cursor = '';
       root.style.touchAction = '';
       if (e && e.target && e.target.releasePointerCapture) {
-        try { e.target.releasePointerCapture(e.pointerId); } catch (_) {}
+        try { e.target.releasePointerCapture(e.pointerId); } catch (_) { }
       }
       root.removeEventListener('pointerdown', onDown);
       document.removeEventListener('pointermove', onMove);
@@ -1313,11 +1313,31 @@
           <p>感谢您安装本脚本！为了让您更好地使用，请花 1 分钟阅读以下指南：</p>
 
           <h2>👀 悬浮窗去哪了？为什么不显示？</h2>
-          <p>这是最常见的问题。请注意，悬浮控件<span class="highlight">默认只会在搜索引擎的搜索结果页面显示</span>！</p>
+          <p>为了给您提供纯净的排版体验并避免遮挡内容，本脚本的默认机制是：<span class="highlight" style="color:#d9534f;">在未检测到“搜索需求”时，自动隐藏自身。</span></p>
+
+          <p><strong>具体在以下几种情况下，悬浮窗默认会“消失”：</strong></p>
           <ul>
-            <li>如果您在普通的网页（如百度百科、普通新闻网站等），悬浮窗是<strong>不会出现</strong>的。</li>
-            <li>只有当您打开了如 <strong>Google、Bing、百度</strong> 等搜索引擎的网页时，它才会出现在页面底部。</li>
+            <li><strong>浏览非引擎的普通网页</strong>：如新闻、博客、百度百科等不在您列表范围内的页面，悬浮窗绝不会多余出现。</li>
+            <li><strong>停留在搜索引擎的首页大厅</strong>：当您刚打开 <strong>GitHub、百度、Google 的主页</strong>时，由于您还没有真正输入回车发起搜索，网页网址里并没有“搜索参数”，插件认为此时任务未开始，所以选择保持隐藏。</li>
           </ul>
+
+          <p><strong>什么情况下它会自动“呼出”？</strong></p>
+          <ul>
+            <li><strong>进入了实际的搜索结果页</strong>：只要您提交了搜索（网址栏能看到带有 <code>q=</code> 或 <code>wd=</code> 等请求参数），它就会马上出现在页面底部供您随时切换。</li>
+            <li><strong>用鼠标选中了想搜索的文本</strong>：此时插件检测到你在“划词”，悬浮窗立刻现身让您一键带词去别的引擎查找。</li>
+            <li><strong>您的光标在输入框里并敲了字</strong>：此时也等同于有了即将搜索的意图，它也会随时待命弹起。</li>
+          </ul>
+
+          <div style="background-color: #f0f7ff; border-left: 4px solid #2e5fff; padding: 12px; margin-top: 16px; border-radius: 4px;">
+            <strong style="color: #2e5fff; display: block; margin-bottom: 6px;">💡 觉得这样太麻烦？想要让它在 GitHub 主页也一直保持可见？</strong>
+            如果你希望在主页发呆、或者未搜任何词的情况下也<strong>始终能看到这排按钮</strong>，请按以下步骤操作：
+            <ol style="margin-bottom: 0;">
+              <li>长按一次现有的悬浮窗（或点击小齿轮 ⚙ 图标）唤出设置面板</li>
+              <li>向下划动，找到底部的<strong>【行为选项】</strong>分类</li>
+              <li>将<strong>【无关键词时】</strong>选项的设定从“隐藏切换器”改为<strong>“仍然显示切换器”</strong></li>
+              <li>点击右下角保存设置，它就不会再随意消失了！</li>
+            </ol>
+          </div>
 
           <h2>🖱️ 基础操作</h2>
           <ul>
