@@ -419,9 +419,10 @@
         scrollbar-width: none;
         -webkit-overflow-scrolling: touch;
         flex: 1;
-        mask-image: linear-gradient(to right, #000 calc(100% - 10px), transparent 100%);
-        -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 10px), transparent 100%);
+        mask-image: linear-gradient(to right, transparent 0%, #000 10px, #000 calc(100% - 10px), transparent 100%);
+        -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 10px, #000 calc(100% - 10px), transparent 100%);
         padding-right: 10px;
+        padding-left: 10px;
       }
       #${ROOT_ID} .ses-list::-webkit-scrollbar {
         display: none;
